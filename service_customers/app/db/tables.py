@@ -12,7 +12,7 @@ class Customers(Base):
     full_name = Column(String)
     phone_number = Column(BigInteger, unique=True)
     sex = Column(String)
-    email = Column(String, unique=True)
+    email = Column(String, nullable=True)
     birthday = Column(Date, nullable=True)
     organization = Column(String)
     level = Column(String)

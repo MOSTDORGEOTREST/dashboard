@@ -3,6 +3,8 @@ import os
 from db.database import Session
 from loguru import logger
 import time
+from db.tables import Base
+from db.database import engine
 
 from settings import settings
 import db.tables as tables
@@ -23,6 +25,9 @@ def update_db():
     if not os.path.exists(settings.excel_file):
         raise FileNotFoundError("Отсутствует файл заказчиков")
 
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+
     try:
         wb = openpyexcel.load_workbook(settings.excel_file)
         for i in tqdm(range(2, len(wb["Лист1"]['B']) + 1)):
@@ -34,25 +39,19 @@ def update_db():
             sex = wb["Лист1"]['G' + str(i)].value
             level = wb["Лист1"]['H' + str(i)].value
 
-
             if full_name is not None:
                 session = Session()
-                get = session.query(tables.Customers).filter_by(full_name=full_name).first()
+                session.add(tables.Customers(
+                    full_name=full_name,
+                    phone_number=phone_number,
+                    email=email,
+                    birthday=birthday,
+                    organization=organization,
+                    sex=sex,
+                    level=level
+                ))
+                session.commit()
                 session.close()
-
-                if not get:
-                    session = Session()
-                    session.add(tables.Customers(
-                        full_name=full_name,
-                        phone_number=phone_number,
-                        email=email,
-                        birthday=birthday,
-                        organization=organization,
-                        sex=sex,
-                        level=level
-                    ))
-                    session.commit()
-                    session.close()
 
     except Exception as err:
             logger.error("Ошибка создания базы заказчиков" + str(err))
