@@ -23,7 +23,7 @@
     Для Windows ничего не делаем. Далее испозьзуем `YOUR_PATH = ip_диска/files`
 
 3. Создать структуру папок:\
-   -/home/database/\
+   -/home/databases/\
    ---customers\
    ------customers.xlsx   
    ------photos\
