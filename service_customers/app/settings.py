@@ -2,7 +2,7 @@ from pydantic import BaseSettings
 
 
 customers = "/databases/customers/"
-#customers = "/home/nick/databases/customers/"
+#customers = "/home/tnick/databases/customers/"
 
 class Settings(BaseSettings):
     server_host: str = "0.0.0.0"
