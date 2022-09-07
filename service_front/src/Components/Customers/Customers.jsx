@@ -11,7 +11,7 @@ import { phoneFormatter, formDay } from '../utils'
 export default function Customers() {
 	const { api_customers } = useContext(Context)
 	const isLogged = true
-	const [customers, setCustomers] = useState([{}])
+	const [customers, setCustomers] = useState([])
 
 	const [loaded, setLoaded] = useState(false)
 
@@ -20,7 +20,7 @@ export default function Customers() {
 	useEffect(() => {
 		if (!isLogged) {
 			setLoaded(false)
-			setCustomers([{}])
+			setCustomers([])
 			return
 		}
 
@@ -28,14 +28,16 @@ export default function Customers() {
 			if (isLogged) {
 				fetch(
 					`${api_customers}customers/month_birthday/?month=${currentMonth.current}`
-				)
-					.then((response) => response.json())
-					.then((data) => {
-						if (data && data.length > 0) {
-							setCustomers(data)
-							setLoaded(true)
-						}
-					})
+				).then((response) => {
+					if (response.ok) {
+						response.json().then((data) => {
+							if (data) {
+								if (data.length > 0) setCustomers(data)
+								setLoaded(true)
+							}
+						})
+					}
+				})
 			}
 		}
 
@@ -71,29 +73,36 @@ export default function Customers() {
 											</tr>
 										</thead>
 										<tbody>
-											{customers.map((customer) => (
-												<tr className="customers-table__row" key={customer.id}>
-													<td>
-														<div className="customer__name">
-															<img
-																className="customer__icon"
-																src={getImg(customer.id)}
-																alt="User"
-																onError={({ currentTarget }) => {
-																	currentTarget.onerror = null // prevents looping
-																	currentTarget.src = stock
-																}}
-															></img>
-															{customer.full_name}
-														</div>
-													</td>
-													<td className="date">{formDay(customer.birthday)}</td>
-													<td>{customer.organization}</td>
-													<td className="phone">
-														{phoneFormatter(customer.phone_number)}
-													</td>
-												</tr>
-											))}
+											{customers.length > 0
+												? customers.map((customer) => (
+														<tr
+															className="customers-table__row"
+															key={customer.id}
+														>
+															<td>
+																<div className="customer__name">
+																	<img
+																		className="customer__icon"
+																		src={getImg(customer.id)}
+																		alt="User"
+																		onError={({ currentTarget }) => {
+																			currentTarget.onerror = null // prevents looping
+																			currentTarget.src = stock
+																		}}
+																	></img>
+																	{customer.full_name}
+																</div>
+															</td>
+															<td className="date">
+																{formDay(customer.birthday)}
+															</td>
+															<td>{customer.organization}</td>
+															<td className="phone">
+																{phoneFormatter(customer.phone_number)}
+															</td>
+														</tr>
+												  ))
+												: null}
 										</tbody>
 									</table>
 								</div>
