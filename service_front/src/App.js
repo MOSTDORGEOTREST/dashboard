@@ -54,7 +54,7 @@ function App() {
 			</Context.Provider>
 
 			<div
-				class={showScroll ? 'scrolltop show-scroll' : 'scrolltop'}
+				className={showScroll ? 'scrolltop show-scroll' : 'scrolltop'}
 				id="scroll-top"
 				onClick={() => {
 					window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })

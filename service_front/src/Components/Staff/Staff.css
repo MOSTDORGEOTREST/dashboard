@@ -123,6 +123,17 @@
 	.staff-item {
 		padding: 0rem 0.5rem 0.25rem 0.5rem;
 	}
+
+	.bd-grid {
+		padding-right: 8px;
+		padding-left: 8px;
+		
+		grid-template-columns: 100%;
+	}
+
+	.bd-card{
+		height: fit-content;
+	}
 }
 
 .bd-card:hover {
