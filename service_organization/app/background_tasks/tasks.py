@@ -347,8 +347,15 @@ def report_parser(excel_path: str, current_date: date = date.today()):
             for row in range(START_ROW, nrows):
                 # search for date (YELLOW line)
                 dates = [*__result.keys()]
-                if book.cell_back_color(row, 1) == YELLOW:
 
+                yellow_flag = False
+                for yellow_col in range(1, ncols):
+                    if book.cell_back_color(row, yellow_col) == YELLOW:
+                        yellow_flag = True
+                        break
+                    yellow_flag = False
+
+                if yellow_flag:
                     # save the last date
                     for col in range(1, ncols):
                         value = book.cell_value_date(row, col)
@@ -371,6 +378,8 @@ def report_parser(excel_path: str, current_date: date = date.today()):
 
                 # then parse columns per each engineer
                 for col in range(1, ncols + 1, N_COLS):
+
+                    assert type(book.cell_value(row, col)) != float, "ОШИБКА В ТИПЕ ДАННЫХ. ПРОВЕРЬ ШАБЛОН"
 
                     _object = book.cell_value(row, col).replace(' ', '')
 
