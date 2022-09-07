@@ -31,6 +31,7 @@ def update_db():
     try:
         wb = openpyexcel.load_workbook(settings.excel_file)
         for i in tqdm(range(2, len(wb["Лист1"]['B']) + 1)):
+            id = wb["Лист1"]['A' + str(i)].value
             full_name = wb["Лист1"]['B' + str(i)].value
             phone_number = wb["Лист1"]['C' + str(i)].value
             email = wb["Лист1"]['D' + str(i)].value
@@ -39,9 +40,10 @@ def update_db():
             sex = wb["Лист1"]['G' + str(i)].value
             level = wb["Лист1"]['H' + str(i)].value
 
-            if full_name is not None:
+            if full_name is not None and id:
                 session = Session()
                 session.add(tables.Customers(
+                    id=id,
                     full_name=full_name,
                     phone_number=phone_number,
                     email=email,
