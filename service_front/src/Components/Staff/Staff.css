@@ -114,24 +114,24 @@
 }
 
 @media screen and (max-width: 768px) {
-	.staff-item {
+	/* .staff-item {
 		padding: 0.75rem 0.75rem 0.75rem 0.75rem;
-	}
+	} */
 }
 
 @media screen and (max-width: 475px) {
-	.staff-item {
+	/* .staff-item {
 		padding: 0rem 0.5rem 0.25rem 0.5rem;
-	}
+	} */
 
 	.bd-grid {
 		padding-right: 8px;
 		padding-left: 8px;
-		
+
 		grid-template-columns: 100%;
 	}
 
-	.bd-card{
+	.bd-card {
 		height: fit-content;
 	}
 }
