@@ -37,11 +37,14 @@
 	table-layout: fixed;
 }
 
-.customers-table__head {
+.customers-table__head,
+.customers-table__head th {
 	height: 64px;
+	min-height: 64px;
 }
 
 .customers-table__head th {
+	min-height: 100%;
 	text-align: left;
 	font-weight: var(--font-medium);
 }
@@ -102,13 +105,13 @@
 }
 
 @media screen and (max-width: 768px) {
-	.customers-item {
+	/* .customers-item {
 		padding: 0.75rem 0.75rem 0.75rem 0.75rem;
-	}
+	} */
 }
 
 @media screen and (max-width: 475px) {
-	.customers-item {
+	/* .customers-item {
 		padding: 0rem 0.5rem 0.25rem 0.5rem;
-	}
+	} */
 }
