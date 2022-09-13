@@ -14,10 +14,162 @@ from loguru import logger
 import time
 from tqdm import tqdm
 
-from models.reports import Report
-from models.prizes import Prize
+from models.work import Work
+from models.prize import Prize
 import db.tables as tables
 from settings import settings
+
+
+def staff_parser():
+    try:
+        wb = openpyexcel.load_workbook(settings.excel_staff)
+        for i in tqdm(range(2, 50)):
+            name = wb["Лист1"]['B' + str(i)].value
+            if name is not None:
+                password = wb["Лист1"]['C' + str(i)].value
+                phone_number = int(wb["Лист1"]['D' + str(i)].value) if wb["Лист1"]['F' + str(i)].value is not None else None
+                birthday = wb["Лист1"]['E' + str(i)].value
+                is_superuser = True if int(wb["Лист1"]['F' + str(i)].value) else False
+                rate = wb["Лист1"]['G' + str(i)].value
+                developer_percent = wb["Лист1"]['H' + str(i)].value
+                calculation_percent = wb["Лист1"]['I' + str(i)].value
+
+                session = Session()
+                get = session.query(tables.Staff).filter_by(full_name=name).first()
+                session.close()
+
+                if not get:
+                    session = Session()
+                    session.add(tables.Staff(
+                        full_name=name,
+                        password_hash=bcrypt.hash(password),
+                        phone_number=phone_number,
+                        birthday=birthday,
+                        is_superuser=is_superuser,
+                        rate=rate,
+                        developer_percent=developer_percent,
+                        calculation_percent=calculation_percent
+                    ))
+                    session.commit()
+                    session.close()
+
+    except Exception as err:
+        logger.error("Ошибка создания базы пользователей " + str(err))
+
+def work_types_parser():
+    try:
+        wb = openpyexcel.load_workbook(settings.excel_work_types)
+        for i in tqdm(range(2, 50)):
+            name = wb["Лист1"]['A' + str(i)].value
+            if name is not None:
+                price = wb["Лист1"]['C' + str(i)].value
+                category = wb["Лист1"]['B' + str(i)].value
+                dev_tips = wb["Лист1"]['D' + str(i)].value
+
+                session = Session()
+                get = session.query(tables.WorkType).filter_by(work_name=name).first()
+                if not get:
+                    session = Session()
+                    session.add(
+                        tables.WorkType(
+                            work_name=name,
+                            price=price,
+                            dev_tips=dev_tips,
+                            category=category
+                        )
+                    )
+                    session.commit()
+                session.close()
+
+    except Exception as err:
+        logger.error("Ошибка создания базы типов работ " + str(err))
+
+def prize_parser(excel_directory: str, current_date: date = date.today()):
+
+    def get_current_prize(excel_directory, current_date):
+        mounth, year = current_date.strftime('%m'), "20" + current_date.strftime('%y')
+
+        try:
+            path = os.path.join(
+                f'{excel_directory}{year}',
+                f'{mounth}.{year} - Учет офисного времени.xls')
+
+            if os.path.exists(path):
+
+                with xlrd.open_workbook(path) as workbook:
+                    worksheet = workbook.sheet_by_name('Итог')
+                    prize = worksheet.cell(0, 24).value
+
+                if prize == "ххх" or prize == "xxx":
+                    prize = 0.0
+                else:
+                    prize = float(prize)
+
+            else:
+                prize = 0.0
+
+        except:
+            prize = 0.0
+
+        return prize
+
+    def update_run(excel_dir, base_prize, current_date):
+        prize = get_current_prize(excel_dir, current_date)
+
+        if prize > base_prize:
+            data = {
+                "date": date(year=current_date.year, month=current_date.month, day=25),
+                "value": prize,
+            }
+
+            prize_data = Prize(**data)
+
+            test = _get(date=prize_data.date)
+
+            if test is not None:
+                update(data=prize_data)
+            else:
+                create(data=prize_data)
+
+    def _get(date: date) -> tables.Prize:
+        session = Session()
+        prize = session.query(tables.Prize).filter_by(date=date).first()
+        session.close()
+        return prize
+
+    def update(data: Prize) -> None:
+        session = Session()
+        prize = session.query(tables.Prize).filter_by(date=data.date).first()
+        for field, value in data:
+            setattr(prize, field, value)
+        session.commit()
+        session.close()
+
+    def create(data: Prize) -> None:
+        session = Session()
+        session.add(tables.Prize(**data.dict()))
+        session.commit()
+        session.close()
+
+    if not os.path.exists(excel_directory):
+        raise FileNotFoundError("Отсутствует файл премии")
+
+    _excel_directory = excel_directory
+
+    base_prize = _get(date(year=current_date.year, month=current_date.month, day=25))
+
+    if not base_prize:
+        _prize = 0.0
+    else:
+        _prize = base_prize.prize
+
+    update_run(_excel_directory, _prize, current_date)
+
+
+
+
+
+
 
 @dataclass
 class Unit:
@@ -147,87 +299,6 @@ class XlsBook:
 
     def __get_color(self, color_index: int):
         return self.book.colour_map.get(color_index)
-
-def prize_parser(excel_directory: str, current_date: date = date.today()):
-
-    def get_current_prize(excel_directory, current_date):
-        mounth, year = current_date.strftime('%m'), "20" + current_date.strftime('%y')
-
-        try:
-            path = os.path.join(
-                f'{excel_directory}{year}',
-                f'{mounth}.{year} - Учет офисного времени.xls')
-
-            if os.path.exists(path):
-
-                with xlrd.open_workbook(path) as workbook:
-                    worksheet = workbook.sheet_by_name('Итог')
-                    prize = worksheet.cell(0, 24).value
-
-                if prize == "ххх" or prize == "xxx":
-                    prize = 0.0
-                else:
-                    prize = float(prize)
-
-            else:
-                prize = 0.0
-
-        except:
-            prize = 0.0
-
-        return prize
-
-    def update_run(excel_dir, base_prize, current_date):
-        prize = get_current_prize(excel_dir, current_date)
-
-        if prize > base_prize:
-            data = {
-                "date": date(year=current_date.year, month=current_date.month, day=25),
-                "prize": prize,
-            }
-
-            prize_data = Prize(**data)
-
-            test = _get(date=prize_data.date)
-
-            if test is not None:
-                update(data=prize_data)
-            else:
-                create(data=prize_data)
-
-    def _get(date: date) -> tables.Prize:
-        session = Session()
-        prize = session.query(tables.Prize).filter_by(date=date).first()
-        session.close()
-        return prize
-
-    def update(data: Prize) -> None:
-        session = Session()
-        prize = session.query(tables.Prize).filter_by(date=data.date).first()
-        for field, value in data:
-            setattr(prize, field, value)
-        session.commit()
-        session.close()
-
-    def create(data: Prize) -> None:
-        session = Session()
-        session.add(tables.Prize(**data.dict()))
-        session.commit()
-        session.close()
-
-    if not os.path.exists(excel_directory):
-        raise FileNotFoundError("Отсутствует файл премии")
-
-    _excel_directory = excel_directory
-
-    base_prize = _get(date(year=current_date.year, month=current_date.month, day=25))
-
-    if not base_prize:
-        _prize = 0.0
-    else:
-        _prize = base_prize.prize
-
-    update_run(_excel_directory, _prize, current_date)
 
 def report_parser(excel_path: str, current_date: date = date.today()):
 
@@ -474,7 +545,7 @@ def report_parser(excel_path: str, current_date: date = date.today()):
     update_reports(statment_data, base_report_data, current_date)
 
 
-def parser(excel_directory, excel_path, date_delay=3, deelay=10, print=True):
+def parser(excel_directory, excel_path, date_delay=3, deelay=3, print=True):
     time.sleep(deelay)
     while True:
         current_date = date.today() - timedelta(days=date_delay)
@@ -494,18 +565,13 @@ def parser(excel_directory, excel_path, date_delay=3, deelay=10, print=True):
 
         time.sleep(deelay)
 
-def update_db(excel_directory, excel_path):
+def update_db(excel_directory, staff_path):
 
     if not os.path.exists(excel_directory):
         raise FileNotFoundError("Отсутствует файл премии")
 
-    if not os.path.exists(excel_path):
-        raise FileNotFoundError("Отсутствует файл отчетов")
-
-    reports_dates = [
-        date(year=dt.year, month=dt.month, day=25) for dt in rrule.rrule(
-            rrule.MONTHLY, dtstart=date(2022, 1, 1), until=date.today()
-        )]
+    if not os.path.exists(staff_path):
+        raise FileNotFoundError("Отсутствует файл сотрудников")
 
     prize_dates = [
         date(year=dt.year, month=dt.month, day=25) for dt in rrule.rrule(
@@ -515,60 +581,13 @@ def update_db(excel_directory, excel_path):
     for d_p in tqdm(prize_dates):
         try:
             prize_parser(excel_directory, d_p)
-            #logger.info(f"load prize {d_p} id db")
         except Exception as err:
             logger.error("Ошибка обновления премии " + str(err))
 
-    for d_r in tqdm(reports_dates):
-        try:
-            report_parser(excel_path, d_r)
-            #logger.info(f"load reports {d_p} id db")
-        except Exception as err:
-            logger.error("Ошибка обновления отчетов " + str(err))
 
-    try:
-        wb = openpyexcel.load_workbook(settings.excel_staff)
-        for i in tqdm(range(2, 200)):
-            name = wb["Лист1"]['C' + str(i)].value
-            if name is not None:
-                birthday = wb["Лист1"]['D' + str(i)].value
-                phone_number = int(wb["Лист1"]['F' + str(i)].value) if wb["Лист1"]['F' + str(i)].value is not None else None
+    staff_parser()
 
-                session = Session()
-                get = session.query(tables.Staff).filter_by(full_name=name).first()
-                session.close()
-
-                if not get:
-                    session = Session()
-                    session.add(tables.Staff(
-                        full_name=name,
-                        phone=phone_number,
-                        birthday=birthday
-                    ))
-                    session.commit()
-                    session.close()
-
-    except Exception as err:
-            logger.error("Ошибка создания базы пользователей " + str(err))
-
-def create_admin():
-    session = Session()
-    user = session.query(tables.User).filter_by(username="mdgt").first()
-    session.close()
-
-    if not user:
-        session = Session()
-
-        user = tables.User(
-            username="mdgt",
-            password_hash=bcrypt.hash("mdgt"),
-        )
-
-        session.add(user)
-        session.commit()
-        session.close()
-
-
+    work_types_parser()
 
 
 if __name__ == "__main__":

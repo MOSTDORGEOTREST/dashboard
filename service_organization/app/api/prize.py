@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, Response, status
 from typing import List
 from datetime import date
 
-from models.prizes import Prize
-from services.prizes import PrizesService
+from models.prize import Prize
+from services.prize import PrizesService
 
 router = APIRouter(
     prefix="/prizes",

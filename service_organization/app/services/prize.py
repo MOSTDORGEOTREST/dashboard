@@ -2,7 +2,7 @@ from typing import List, Optional
 from datetime import date
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from models.prizes import Prize
+from models.prize import Prize
 
 import db.tables as tables
 from db.database import get_session

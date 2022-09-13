@@ -1,15 +1,28 @@
 from pydantic import BaseModel
 from datetime import date
 
-class StaffBase(BaseModel):
+class BaseUser(BaseModel):
     full_name: str
-    phone: int
+    phone_number: int
     birthday: date
+    is_superuser: bool
+    rate: int
+    developer_percent: float
+    calculation_percent: float
 
-class Staff(StaffBase):
+class UserCreate(BaseUser):
+    password: str
+
+class UserUpdate(BaseUser):
+    password: str
+
+class User(BaseUser):
     id: int
+
     class Config:
         orm_mode = True
 
-class StaffCreate(StaffBase):
-    pass
+class Token(BaseModel):
+    access_token: str
+    token_type: str = 'bearer'
+

@@ -3,7 +3,7 @@ from datetime import date
 
 class Prize(BaseModel):
     date: date
-    prize: float
+    value: float
 
     class Config:
         orm_mode = True

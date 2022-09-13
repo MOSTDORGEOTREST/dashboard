@@ -1,7 +1,7 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api import router
-from background_tasks import create_admin, update_db
+from background_tasks import update_db
 from db.tables import Base
 import http
 from db.database import engine
@@ -18,7 +18,6 @@ def create_ip_ports_array(ip: str, *ports):
     array.append(f"http://{ip}")
     for port in ports:
         array.append(f"http://{ip}:{str(port)}")
-    print(array)
     return array
 
 app = FastAPI(
@@ -62,6 +61,6 @@ templates = Jinja2Templates(directory="templates")
 
 @app.on_event("startup")
 def startup_event():
+    Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
-    create_admin()
-    update_db(settings.prize_directory, settings.statment_excel_path)
+    update_db(settings.prize_directory, settings.excel_staff)

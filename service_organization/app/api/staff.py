@@ -1,53 +1,120 @@
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, status, Response, HTTPException, Request
+from fastapi.responses import JSONResponse
+from fastapi.responses import RedirectResponse
 from typing import List
-from datetime import date
+from models.staff import UserCreate, Token, User
+from services.staff import StaffService, get_current_user
+from fastapi.security import OAuth2PasswordRequestForm
 
-from models.staff import Staff, StaffCreate, StaffCreate
-from services.staff import StaffService
 
 router = APIRouter(
-    prefix="/staff",
-    tags=['staff'])
+    prefix='/staff',
+    tags=['staff'],
+)
+
+@router.post('/sign-up/', response_model=Token, status_code=status.HTTP_201_CREATED)
+def sign_up(user_data: UserCreate, auth_service: StaffService = Depends()):
+    """Регисртрация нового пользователя и сразу получение токена"""
+    return auth_service.register_new_user(user_data)
 
 
-@router.get("/", response_model=List[Staff])
-def get_staffs(service: StaffService = Depends()):
+@router.post('/sign-in/')
+def sign_in(auth_data: OAuth2PasswordRequestForm = Depends(), auth_service: StaffService = Depends()):
+    """Получение токена (токен зранится в куки)"""
+    token = auth_service.authenticate_user(auth_data.username, auth_data.password)
+    content = {"message": "True"}
+    response = JSONResponse(content=content)
+    response.set_cookie("Authorization", value=f"Bearer {token.access_token}", httponly=True)
+
+    return response
+
+
+@router.get('/user/', response_model=User)
+def get_user(user: User = Depends(get_current_user)):
+    """Просмотр авторизованного пользователя"""
+    return user
+
+
+@router.get("/sign-out/")
+def sign_out_and_remove_cookie(current_user: User = Depends(get_current_user)):
+    # Also tried following two comment lines
+    # response.set_cookie(key="access_token", value="", max_age=1)
+    # response.delete_cookie("access_token", domain="localhost")
+    content = {"message": "Tocken closed"}
+    response = JSONResponse(content=content)
+    response.delete_cookie("Authorization")
+    return response
+
+
+@router.get("/", response_model=List[User])
+def get_staff(service: StaffService = Depends(), current_user: User = Depends(get_current_user)):
     """Запрос всех сотрудников"""
-    return service.get_all()
+    if current_user.is_superuser:
+        return service.get_all()
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Только для суперюзера",
+        )
 
 
-@router.get("/{name}", response_model=List[Staff])
-def get_staff(name: str, service: StaffService = Depends()):
+@router.get("/{name}", response_model=List[User])
+def get_user(name: str, service: StaffService = Depends(), current_user: User = Depends(get_current_user)):
     """Запрос осотрудника по имени"""
-    return service.get(name)
+    if current_user.is_superuser:
+        return service.get(name)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Только для суперюзера",
+        )
 
 
-@router.post("/", response_model=Staff)
-def create_staff(staff_data: StaffCreate, service: StaffService = Depends()):
+@router.post("/", response_model=User)
+def create_user(staff_data: UserCreate, service: StaffService = Depends(), current_user: User = Depends(get_current_user)):
     """Создание сотрудника"""
-    return service.create(staff_data=staff_data)
+    if current_user.is_superuser:
+        return service.create(data=staff_data)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Только для суперюзера",
+        )
 
 
-@router.put('/', response_model=Staff)
-def update_staff(id: int, staff_data: StaffCreate, service: StaffService = Depends()):
+@router.put('/', response_model=User)
+def update_user(id: int, staff_data: UserCreate, service: StaffService = Depends(), current_user: User = Depends(get_current_user)):
     """Обновление данных сотрудника"""
-    return service.update(id=id, staff_data=staff_data)
+    if current_user.is_superuser:
+        return service.update(id=id, data=staff_data)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Только для суперюзера",
+        )
 
 
 @router.delete('/', status_code=status.HTTP_204_NO_CONTENT)
-def delete_staff(id: int, service: StaffService = Depends()):
+def delete_staff(id: int, service: StaffService = Depends(), current_user: User = Depends(get_current_user)):
     """Удаление сотрудника"""
-    service.delete(id=id)
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    if current_user.is_superuser:
+        service.delete(id=id)
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Только для суперюзера",
+        )
 
 
-@router.get("/month_birthday/", response_model=List[Staff])
+@router.get("/month_birthday/", response_model=List[User])
 def get_month_birthday(month: int, service: StaffService = Depends()):
     """Запрос дней рождений за месяц"""
     return service.get_month_birthday(month=month)
 
 
-@router.get("/day_birthday/", response_model=List[Staff])
+@router.get("/day_birthday/", response_model=List[User])
 def get_day_birthday(month: int, day: int, service: StaffService = Depends()):
     """Запрос дней рождений за месяц"""
     return service.get_day_birthday(month=month, day=day)
+
