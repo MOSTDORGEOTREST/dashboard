@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import date
+from enum import Enum
 
 class WorkBase(BaseModel):
     user_id: int
@@ -29,14 +30,17 @@ class WorkPrint(BaseModel):
     count: float
     price: float
 
+class WorkCategory(str, Enum):
+    REPORTS = "Протоколы и ведомости"
+    COURSES = "Курсы"
+    CALCULATIONS = "Расчеты"
 
 class WorkType(BaseModel):
     id: int
     work_name: str
-    category: str
+    category: WorkCategory
     price: float
     dev_tips: float
-
 
     class Config:
         orm_mode = True
