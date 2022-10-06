@@ -23,7 +23,7 @@ class Work(Base):
     user_id = Column(Integer, ForeignKey('Staff.id'))
     date = Column(Date)
     object_number = Column(String)
-    work_id = Column(String, ForeignKey('WorkType.id'))
+    work_id = Column(Integer, ForeignKey('WorkType.id'))
     count = Column(Float)
 
 class WorkType(Base):
