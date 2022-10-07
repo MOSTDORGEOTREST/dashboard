@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, Response, status, HTTPException, Query
 from typing import List, Optional
+from datetime import date
 
-from models.work import Work, WorkCreate, WorkUpdate, WorkType, WorkPrint
+from models.work import Work, WorkCreate, WorkUpdate, WorkType, WorkPrint, Report
 from services.work import WorkService
 from services.staff import get_current_user, User, StaffService
 
@@ -112,6 +113,19 @@ def get_work_types(
         service: WorkService = Depends()):
     """Список работ с ценами"""
     return service.get_work_types()
+
+@router.get("/reports", response_model=List[Report])
+def get_reports(
+        month_period: Optional[int] = Query(6),
+        service: WorkService = Depends()
+):
+    """Запрос отчетов за все месяцы из базы"""
+    return service.get_reports(month_period=month_period)
+
+@router.get("/reports/{date}", response_model=Report)
+def get_report(date: date, service: WorkService = Depends()):
+    """Запрос отчета за конкретный месяц"""
+    return service.get_month_reports(month=date.month, year=date.year)
 
 
 

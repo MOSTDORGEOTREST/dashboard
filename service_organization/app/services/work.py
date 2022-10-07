@@ -1,10 +1,11 @@
 import datetime
-from typing import Optional
+from typing import Optional, List
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import extract
+from dateutil.relativedelta import relativedelta
 
-from models.work import WorkCreate, WorkUpdate, WorkPrint
+from models.work import WorkCreate, WorkUpdate, WorkPrint, Report
 import db.tables as tables
 from db.database import get_session
 
@@ -110,7 +111,7 @@ class WorkService:
     def get_work_types(self) -> Optional[tables.WorkType]:
         return self.session.query(tables.WorkType).all()
 
-    def get_base_pay(self, month: int, year:int, rate: float) -> float:
+    def get_base_pay(self, month: int, year: int, rate: float) -> float:
         """Расчет базовой зарплаты через ставку и премию"""
         prize = self.session.query(tables.Prize).filter_by(date=datetime.date(year=year, month=month, day=25)).first()
         return round((prize.value/100 + 1) * rate, 2)
@@ -145,6 +146,63 @@ class WorkService:
             dev_pay += get(pay_all, tip) * tips[tip]
 
         return dev_pay * (developer_percent / 100)
+
+    def get_month_reports(self, month: int, year: int) -> Report:
+        report_works = self.get_month_work(month=month, year=year, category="Протоколы и ведомости")
+
+        python_report = 0
+        python_dynamic_report = 0
+        python_compression_report = 0
+        mathcad_report = 0
+        physical_statement = 0
+        mechanics_statement = 0
+
+        for report in report_works:
+            if report.work_name == "Протокол python":
+                python_report += 1
+            elif report.work_name == "Протокол по динамике python":
+                python_dynamic_report += 1
+            elif report.work_name == "Протокол по компрессии python":
+                python_compression_report += 1
+            elif report.work_name == "Ведомость физика":
+                physical_statement += 1
+            elif report.work_name == "Ведомость механика":
+                mechanics_statement += 1
+            elif report.work_name == "Протокол mathcad":
+                mathcad_report += 1
+
+        python_all = python_report + python_compression_report + python_dynamic_report
+        python_percent = round((python_all / (python_all + mathcad_report)) * 100, 2)
+
+        return Report(
+            python_report=python_report,
+            python_dynamic_report=python_dynamic_report,
+            python_compression_report=python_compression_report,
+            mathcad_report=mathcad_report,
+            physical_statement=physical_statement,
+            mechanics_statement=mechanics_statement,
+            python_all=python_all,
+            python_percent=python_percent,
+        )
+
+    def get_reports(self, month_period: int) -> List[Report]:
+        res = []
+        for i in range(month_period):
+            current_date = datetime.today() - relativedelta(months=i)
+            res.append(self.get_month_reports(month=current_date.month, year=current_date.year))
+        return res
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
