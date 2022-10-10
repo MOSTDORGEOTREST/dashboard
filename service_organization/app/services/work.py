@@ -6,6 +6,7 @@ from sqlalchemy.sql import extract
 from dateutil.relativedelta import relativedelta
 
 from models.work import WorkCreate, WorkUpdate, WorkPrint, Report
+from models.staff import User
 import db.tables as tables
 from db.database import get_session
 
@@ -191,6 +192,33 @@ class WorkService:
             current_date = datetime.today() - relativedelta(months=i)
             res.append(self.get_month_reports(month=current_date.month, year=current_date.year))
         return res
+
+    def get_month_pay(self, month: int, year: int) -> dict:
+        pay = self.get_month_user_pay(
+            user=User(
+                id=1,
+                full_name='Тишин Никита Романович',
+                phone_number=79096562200,
+                birthday=datetime.date.today(),
+                is_superuser=True,
+                rate=1,
+                developer_percent=100,
+                calculation_percent=100
+            ),
+            month=month,
+            year=year
+        )
+        return {
+            'developer': pay["developer"]
+        }
+
+    def get_pays(self, month_period: int) -> List[Report]:
+        res = []
+        for i in range(month_period):
+            current_date = datetime.today() - relativedelta(months=i)
+            res.append(self.get_month_pay(month=current_date.month, year=current_date.year))
+        return res
+
 
 
 

@@ -118,8 +118,7 @@ async def prizes(message: types.Message):
 @dp.message_handler(commands=["report"])
 async def report(message: types.Message):
     """Запрос отчета за текущий месяц"""
-    today = date.today()
-    report = await get_respones(f'{SERVER_URI}/reports/{today.year}-{today.month}-25')
+    report = await get_respones(f'{SERVER_URI}/works/report')
     if report is None:
         await message.answer(text="Сервер не отвечает " + emoji.emojize(":smiling_face_with_tear:"))
         return
@@ -133,7 +132,7 @@ async def report(message: types.Message):
 @dp.message_handler(commands=["reports"])
 async def reports(message: types.Message):
     """Запрос истории отчетности"""
-    reports = await get_respones(f'{SERVER_URI}/reports/')
+    reports = await get_respones(f'{SERVER_URI}/works/reports/')
     if reports is None:
         await message.answer(text="Сервер не отвечает " + emoji.emojize(":smiling_face_with_tear:"))
         return
@@ -149,8 +148,7 @@ async def reports(message: types.Message):
 @dp.message_handler(commands=["pay"])
 async def pay(message: types.Message):
     """Запрос оплаты за тукущий месяц"""
-    today = date.today()
-    pay = await get_respones_with_auth(f'{SERVER_URI}/pay/{today.year}-{today.month}-25')
+    pay = await get_respones_with_auth(f'{SERVER_URI}/works/pay/')
 
     if pay is None:
         await message.answer(text="Сервер не отвечает " + emoji.emojize(":smiling_face_with_tear:"))
@@ -165,7 +163,7 @@ async def pay(message: types.Message):
 @dp.message_handler(commands=["pays"])
 async def pays(message: types.Message):
     """Запрос статистики оплаты"""
-    pays = await get_respones_with_auth(f'{SERVER_URI}/pay/')
+    pays = await get_respones_with_auth(f'{SERVER_URI}/works/pays/')
     if pays is None:
         await message.answer(text="Сервер не отвечает " + emoji.emojize(":smiling_face_with_tear:"))
         return

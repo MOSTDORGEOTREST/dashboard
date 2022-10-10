@@ -1,3 +1,5 @@
+import datetime
+
 from fastapi import APIRouter, Depends, Response, status, HTTPException, Query
 from typing import List, Optional
 from datetime import date
@@ -83,7 +85,7 @@ def delete_work(
         )
 
 
-@router.get("/pay/")
+@router.get("/pay/{user_id}")
 def get_month_user_pay(
         month: int,
         year: int,
@@ -114,6 +116,7 @@ def get_work_types(
     """Список работ с ценами"""
     return service.get_work_types()
 
+
 @router.get("/reports", response_model=List[Report])
 def get_reports(
         month_period: Optional[int] = Query(6),
@@ -122,11 +125,39 @@ def get_reports(
     """Запрос отчетов за все месяцы из базы"""
     return service.get_reports(month_period=month_period)
 
-@router.get("/reports/{date}", response_model=Report)
-def get_report(date: date, service: WorkService = Depends()):
+@router.get("/report/{month}{year}", response_model=Report)
+def get_report(
+        month: Optional[int] = None,
+        year: Optional[int] = None,
+        service: WorkService = Depends()
+):
     """Запрос отчета за конкретный месяц"""
-    return service.get_month_reports(month=date.month, year=date.year)
+    if not month or not year:
+        current_date = datetime.date.today()
+        month = current_date.month
+        year = current_date.year
+    return service.get_month_reports(month=month, year=year)
 
 
+@router.get("/pays/{month_period}")
+def get_pays(
+        month_period: Optional[int] = Query(6),
+        service: WorkService = Depends()
+):
+    """Запрос отчетов за все месяцы из базы"""
+    return service.get_pays(month_period=month_period)
 
+
+@router.get("/pay/{month}{year}")
+def get_pay(
+        month: Optional[int] = None,
+        year: Optional[int] = None,
+        service: WorkService = Depends()
+):
+    """Запрос отчета за конкретный месяц"""
+    if not month or not year:
+        current_date = datetime.date.today()
+        month = current_date.month
+        year = current_date.year
+    return service.get_month_pay(month=month, year=year)
 
