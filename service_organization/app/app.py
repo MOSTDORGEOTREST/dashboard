@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api import router
-from background_tasks import update_db, parser
+from background_tasks import parser
 from db.tables import Base
 import http
 from db.database import engine
