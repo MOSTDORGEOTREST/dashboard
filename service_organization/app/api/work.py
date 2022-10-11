@@ -125,7 +125,8 @@ def get_reports(
     """Запрос отчетов за все месяцы из базы"""
     return service.get_reports(month_period=month_period)
 
-@router.get("/report/{month}{year}", response_model=Report)
+
+@router.get("/report", response_model=Report)
 def get_report(
         month: Optional[int] = None,
         year: Optional[int] = None,
@@ -139,7 +140,7 @@ def get_report(
     return service.get_month_reports(month=month, year=year)
 
 
-@router.get("/pays/{month_period}")
+@router.get("/pays")
 def get_pays(
         month_period: Optional[int] = Query(6),
         service: WorkService = Depends()
@@ -148,7 +149,7 @@ def get_pays(
     return service.get_pays(month_period=month_period)
 
 
-@router.get("/pay/{month}{year}")
+@router.get("/pay")
 def get_pay(
         month: Optional[int] = None,
         year: Optional[int] = None,
