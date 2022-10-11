@@ -12,7 +12,8 @@ from tqdm import tqdm
 from models.work import Work, WorkCreate
 from background_tasks.statment_model import XlsBook, Unit
 from models.prize import Prize
-import db.tables as tables, Base
+import db.tables as tables
+from db.tables import Base
 from db.database import engine
 from settings import settings
 
