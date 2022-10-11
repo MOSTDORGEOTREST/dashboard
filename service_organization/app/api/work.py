@@ -1,6 +1,6 @@
 import datetime
 
-from fastapi import APIRouter, Depends, Response, status, HTTPException, Query
+from fastapi import APIRouter, Depends, Response, status, HTTPException, Query, Path
 from typing import List, Optional
 from datetime import date
 
@@ -15,8 +15,8 @@ router = APIRouter(
 
 @router.get("/", response_model=List[WorkPrint])
 def get_work(
-        month: int,
-        year: int,
+        month: int = Path(..., qt=1, le=12),
+        year: int = Path(..., qt=2017, le=2030),
         user_id: Optional[int] = Query(None),
         service: WorkService = Depends(),
         current_user: User = Depends(get_current_user)
@@ -87,8 +87,8 @@ def delete_work(
 
 @router.get("/pay/{user_id}")
 def get_month_user_pay(
-        month: int,
-        year: int,
+        month: int = Path(..., qt=1, le=12),
+        year: int = Path(..., qt=2017, le=2030),
         user_id: Optional[int] = Query(None),
         service: WorkService = Depends(),
         user_service: StaffService = Depends(),
@@ -119,7 +119,7 @@ def get_work_types(
 
 @router.get("/reports", response_model=List[Report])
 def get_reports(
-        month_period: Optional[int] = Query(6),
+        month_period: Optional[int] = Query(default=6),
         service: WorkService = Depends()
 ):
     """Запрос отчетов за все месяцы из базы"""
@@ -128,8 +128,8 @@ def get_reports(
 
 @router.get("/report", response_model=Report)
 def get_report(
-        month: Optional[int] = None,
-        year: Optional[int] = None,
+        month: Optional[int] = Path(default=None, qt=1, le=12),
+        year: Optional[int] = Path(default=None, qt=2017, le=2030),
         service: WorkService = Depends()
 ):
     """Запрос отчета за конкретный месяц"""
@@ -151,8 +151,8 @@ def get_pays(
 
 @router.get("/pay")
 def get_pay(
-        month: Optional[int] = None,
-        year: Optional[int] = None,
+        month: Optional[int] = Path(default=None, qt=1, le=12),
+        year: Optional[int] = Path(default=None, qt=2017, le=2030),
         service: WorkService = Depends()
 ):
     """Запрос отчета за конкретный месяц"""
