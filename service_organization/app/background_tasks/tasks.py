@@ -1,24 +1,20 @@
-import re
-from dataclasses import dataclass
 from datetime import datetime, date, timedelta
 from dateutil import rrule
 from passlib.hash import bcrypt
-from pydantic import ValidationError
 import openpyexcel
 import os
 from db.database import Session
-from typing import Dict
 import xlrd
-from xlrd import open_workbook
 from loguru import logger
 import time
 from tqdm import tqdm
 
-from models.work import Work
+from models.work import Work, WorkCreate
+from background_tasks.statment_model import XlsBook, Unit
 from models.prize import Prize
-import db.tables as tables
+import db.tables as tables, Base
+from db.database import engine
 from settings import settings
-
 
 def staff_parser():
     try:
@@ -84,7 +80,7 @@ def work_types_parser():
     except Exception as err:
         logger.error("Ошибка создания базы типов работ " + str(err))
 
-def prize_parser(excel_directory: str, current_date: date = date.today()):
+def prize_parser(current_date: date = date.today()):
 
     def get_current_prize(excel_directory, current_date):
         mounth, year = current_date.strftime('%m'), "20" + current_date.strftime('%y')
@@ -151,6 +147,8 @@ def prize_parser(excel_directory: str, current_date: date = date.today()):
         session.commit()
         session.close()
 
+    excel_directory = settings.prize_directory
+
     if not os.path.exists(excel_directory):
         raise FileNotFoundError("Отсутствует файл премии")
 
@@ -165,180 +163,46 @@ def prize_parser(excel_directory: str, current_date: date = date.today()):
 
     update_run(_excel_directory, _prize, current_date)
 
+def report_parser():
+    def get_works(main_data):
+        for date in main_data:
+            for unit in main_data[date]:
+                user_dict = {
+                    'Баранов С.С.': 18,
+                    'Денисова Л.Г.': 11,
+                    'Жмылёв Д.А.': 8,
+                    'Михайлов А.И.': 9,
+                    'Михайлова Е.В.': 37,
+                    'Михалева О.В.': 22,
+                    'Селиванова О.С.': 34,
+                    'Семенова О.В.': 15,
+                    'Сергиенко В.В.': 33,
+                    'Тишин Н.Р.': 2,
+                    'Чалая Т.А.': 17,
+                    'Шарунова А.А.': 20,
+                    'Орлов М.С.': 38,
+                    'Савенков Д.В.': 39,
 
+                }
 
+                work_dict = {
+                    'mathcad_report': 6,
+                    'python_compression_report': 3,
+                    'python_report': 1,
+                    'python_dynamic_report': 2,
+                    'physical_statement': 4,
+                    'mechanics_statement': 5
+                }
 
+                work_name, count = unit.get_work()
 
-
-
-@dataclass
-class Unit:
-    """Класс хранит одну строчку с выданными протоколами и ведомостями по объекту"""
-    object_number: str = None
-    engineer: str = "unknown"
-    mathcad_report: int = 0
-    python_compression_report: int = 0
-    python_report: int = 0
-    python_dynamic_report: int = 0
-    plaxis_report: int = 0
-    physical_statement: int = 0
-    mechanics_statement: int = 0
-
-    def __repr__(self):
-        return f"\n\t\t\tОбъект: {self.object_number}, Исполнитель: {self.engineer}," \
-               f" Протоколы: Маткад - {self.mathcad_report}, Python Компрессия - {self.python_compression_report}," \
-               f" Python Другое - {self.python_report}, Python Динамика - {self.python_dynamic_report}," \
-               f" Plaxis - {self.plaxis_report};" \
-               f" Ведомости: Механика - {self.mechanics_statement}, Физика - {self.physical_statement}"
-
-    def get_reports(self):
-        return {'mathcad_report': self.mathcad_report, 'python_compression_report': self.python_compression_report,
-                'python_report': self.python_report, 'python_dynamic_report': self.python_dynamic_report,
-                'plaxis_report': self.plaxis_report, 'physical_statement': self.physical_statement,
-                'mechanics_statement': self.mechanics_statement}
-
-class XlsBook:
-    """
-    Convenience class for xlrd xls reader (only read mode)
-    Note: Methods imputes operates with Natural columns and rows indexes
-    """
-
-    book = None
-    sheet = None
-
-    __sheet_index: int
-
-    def __init__(self, path: str):
-        self.set_book(path)
-
-    def set_book(self, path: str):
-        assert path.endswith('.xls'), 'Template should be .xls file format'
-        self.book = open_workbook(path, formatting_info=True)
-        self.set_sheet_by_index(0)
-
-    def set_sheet_by_index(self, index: int):
-        self.sheet = self.book.sheet_by_index(index)
-        self.__sheet_index = index
-
-    def set_next_sheet(self):
-        _last_sheet_index = self.sheet_count() - 1
-        if self.__sheet_index < _last_sheet_index:
-            self.set_sheet_by_index(self.__sheet_index + 1)
-
-    def is_empty_sheet(self, min_cols: int = 1, min_rows: int = 1) -> bool:
-        if self.sheet.ncols < min_cols or self.sheet.nrows < min_rows:
-            return True
-        return False
-
-    def get_sheet_index(self) -> int:
-        return self.__sheet_index
-
-    def sheet_count(self) -> int:
-        return len(self.book.sheet_names())
-
-    def sheet_names(self) -> list:
-        return self.book.sheet_names()
-
-    def cell_value(self, natural_row: int, natural_column: int):
-        return self.sheet.cell(natural_row - 1, natural_column - 1).value
-
-    def cell_value_int(self, natural_row: int, natural_column: int) -> int:
-        value = self.cell_value(natural_row, natural_column)
-        try:
-            return int(value)
-        except ValueError:
-            return 0
-
-    def cell_value_date(self, natural_row: int, natural_column: int):
-        MARKS = ['/', ' ', ',']
-
-        value = str(self.cell_value(natural_row, natural_column))
-
-        if not value.replace(' ', ''):
-            return None
-
-        if self.cell_value_int(natural_row, natural_column):
-            value = self.cell_value_int(natural_row, natural_column)
-            return xlrd.xldate_as_datetime(value, 0)
-
-        for mark in MARKS:
-            if mark in value:
-                value = value.replace(mark, '.')
-
-        if re.fullmatch(r'[0-9]{2}[.][0-9]{2}[.][0-9]{4}', value):
-            try:
-                return datetime.strptime(value, '%d.%m.%Y').date()
-            except ValueError:
-                pass
-        if re.fullmatch(r'[0-9]{2}[.][0-9]{2}[.][0-9]{2}', value):
-            try:
-                return datetime.strptime(value, '%d.%m.%y').date()
-            except ValueError:
-                pass
-
-        return None
-
-    def cell_back_color(self, natural_row: int, natural_column: int):
-        row = natural_row - 1
-        col = natural_column - 1
-        cell = self.sheet.cell(row, col)
-        xf = self.book.xf_list[cell.xf_index]
-        if not xf.background:
-            return None
-        return self.__get_color(xf.background.pattern_colour_index)
-
-    def cell_front_color(self, natural_row: int, natural_column: int):
-        row = natural_row - 1
-        col = natural_column - 1
-        cell = self.sheet.cell(row, col)
-        xf = self.book.xf_list[cell.xf_index]
-        font = self.book.font_list[xf.font_index]
-        if not font:
-            return None
-        return self.__get_color(font.colour_index)
-
-    def __get_color(self, color_index: int):
-        return self.book.colour_map.get(color_index)
-
-def report_parser(excel_path: str, current_date: date = date.today()):
-
-    def get_month_count(main_data, date: datetime):
-        result: Dict = {}
-
-        if date not in main_data.keys():
-            return result
-
-        for unit in main_data[date]:
-            reports = unit.get_reports()
-            for report in reports:
-                if report not in result.keys():
-                    result[report] = reports[report]
-                else:
-                    result[report] += reports[report]
-
-        return result
-
-    def update_reports(statment_data, base_report_data, current_date):
-        res = get_month_count(statment_data, datetime(year=current_date.year, month=current_date.month, day=1))
-        if res:
-            res["python_all"] = res['python_report'] + res['python_compression_report'] + res['python_dynamic_report']
-            all = res["python_all"] + res['mathcad_report']
-            res["date"] = date(year=current_date.year, month=current_date.month, day=25)
-            if all:
-                res["python_percent"] = round((res["python_all"] / all) * 100, 2)
-            else:
-                res["python_percent"] = 0.0
-
-            if base_report_data.dict() != res:
-
-                rep_data = Report(**res)
-
-                test = _get(date=rep_data.date)
-
-                if test is not None:
-                    update(data=rep_data)
-                else:
-                    create(data=rep_data)
+                yield WorkCreate(
+                    user_id=user_dict(unit.engineer),
+                    date=date,
+                    object_number=unit.object_number,
+                    work_id=work_dict[work_name],
+                    count=count
+                )
 
     def read_excel_statment(path: str) -> 'ReportParser.data':
         __result: 'ReportParser.data' = {}
@@ -497,97 +361,63 @@ def report_parser(excel_path: str, current_date: date = date.today()):
 
         return result
 
-    def _get(date: date) -> tables.Report:
+    def create(data: WorkCreate) -> None:
         session = Session()
-        report = session.query(tables.Report).filter_by(date=date).first()
-        session.close()
-        return report
-
-    def update(data: Report) -> None:
-        session = Session()
-        report = session.query(tables.Report).filter_by(date=data.date).first()
-        for field, value in data:
-            setattr(report, field, value)
+        session.add(tables.Work(**data.dict()))
         session.commit()
         session.close()
 
-    def create(data: Report) -> None:
-        session = Session()
-        session.add(tables.Report(**data.dict()))
-        session.commit()
-        session.close()
+    excel_path = settings.statment_excel_path
 
     if not os.path.exists(excel_path):
         raise FileNotFoundError("Отсутствует файл отчетов")
 
-    _excel_path = excel_path
-
-    base_report_data = _get(date(year=current_date.year, month=current_date.month, day=25))
-
-    if not base_report_data:
-        base_report_data = Report.parse_obj(
-            {
-                "date": -1,
-                "python_report": -1,
-                "python_dynamic_report": -1,
-                "python_compression_report": -1,
-                "mathcad_report": -1,
-                "physical_statement":  -1,
-                "mechanics_statement": -1,
-                "python_all": -1,
-                "python_percent": -1,
-            }
-        )
-    else:
-        base_report_data = Report.from_orm(base_report_data)
-
     statment_data = read_excel_statment(excel_path)
-    update_reports(statment_data, base_report_data, current_date)
 
+    for work in get_works(statment_data):
+        create(data=work)
 
-def parser(excel_directory, excel_path, date_delay=3, deelay=3, print=True):
-    time.sleep(deelay)
-    while True:
-        current_date = date.today() - timedelta(days=date_delay)
+def parser(deelay=None):
+
+    def f():
+        Base.metadata.drop_all(engine)
+        Base.metadata.create_all(engine)
+
+        prize_dates = [
+            date(year=dt.year, month=dt.month, day=25) for dt in rrule.rrule(
+                rrule.MONTHLY, dtstart=date(2020, 5, 1), until=date.today()
+            )]
+
+        for d_p in tqdm(prize_dates):
+            try:
+                prize_parser(d_p)
+            except Exception as err:
+                logger.error("Ошибка обновления премии " + str(err))
+
         try:
-            prize_parser(excel_directory, current_date)
-            if print:
-                logger.info("successful update prize")
-        except Exception as err:
-            logger.error("Ошибка обновления премии " + str(err))
-
-        try:
-            report_parser(excel_path, current_date)
-            if print:
-                logger.info("successful update reports")
+            report_parser()
+            logger.info("successful update reports")
         except Exception as err:
             logger.error("Ошибка обновления отчетов " + str(err))
 
-        time.sleep(deelay)
-
-def update_db(excel_directory, staff_path):
-
-    if not os.path.exists(excel_directory):
-        raise FileNotFoundError("Отсутствует файл премии")
-
-    if not os.path.exists(staff_path):
-        raise FileNotFoundError("Отсутствует файл сотрудников")
-
-    prize_dates = [
-        date(year=dt.year, month=dt.month, day=25) for dt in rrule.rrule(
-            rrule.MONTHLY, dtstart=date(2020, 5, 1), until=date.today()
-        )]
-
-    for d_p in tqdm(prize_dates):
         try:
-            prize_parser(excel_directory, d_p)
+            staff_parser()
+            logger.info("successful update staff")
         except Exception as err:
-            logger.error("Ошибка обновления премии " + str(err))
+            logger.error("Ошибка обновления сотрудников " + str(err))
 
+        try:
+            work_types_parser()
+            logger.info("successful update work types")
+        except Exception as err:
+            logger.error("Ошибка обновления типов работ " + str(err))
 
-    staff_parser()
-
-    work_types_parser()
+    if not deelay:
+        f()
+    else:
+        while True:
+            f()
+            time.sleep(deelay)
 
 
 if __name__ == "__main__":

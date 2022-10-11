@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api import router
-from background_tasks import update_db
+from background_tasks import update_db, parser
 from db.tables import Base
 import http
 from db.database import engine
@@ -61,6 +61,4 @@ templates = Jinja2Templates(directory="templates")
 
 @app.on_event("startup")
 def startup_event():
-    Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)
-    update_db(settings.prize_directory, settings.excel_staff)
+    parser()
