@@ -398,11 +398,11 @@ def parser(deelay=None):
             except Exception as err:
                 logger.error("Ошибка обновления премии " + str(err))
 
-        try:
-            report_parser()
-            logger.info("successful update reports")
-        except Exception as err:
-            logger.error("Ошибка обновления отчетов " + str(err))
+        #try:
+            #report_parser()
+            #logger.info("successful update reports")
+        #except Exception as err:
+            #logger.error("Ошибка обновления отчетов " + str(err))
 
         try:
             staff_parser()
