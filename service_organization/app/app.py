@@ -61,4 +61,5 @@ templates = Jinja2Templates(directory="templates")
 
 @app.on_event("startup")
 def startup_event():
-    parser()
+    Base.metadata.create_all(engine)
+    #parser()

@@ -6,11 +6,11 @@ from threading import Thread
 
 if __name__ == "__main__":
 
-    parser_thread = Thread(
-        target=parser,
-        args=(10000,),
-        daemon=True,
-    ).start()
+    #parser_thread = Thread(
+    #    target=parser,
+    #    args=(10000,),
+    #    daemon=True,
+    #).start()
 
     uvicorn.run(
         app,
