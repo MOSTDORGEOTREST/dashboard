@@ -1,6 +1,6 @@
 import datetime
 
-from fastapi import APIRouter, Depends, Response, status, HTTPException, Query, Path
+from fastapi import APIRouter, Depends, Response, status, HTTPException, Query
 from typing import List, Optional
 from datetime import date
 
@@ -15,8 +15,8 @@ router = APIRouter(
 
 @router.get("/", response_model=List[WorkPrint])
 def get_work(
-        month: int = Path(..., qt=1, le=12),
-        year: int = Path(..., qt=2017, le=2030),
+        month: int = Query(qt=1, le=12),
+        year: int = Query(qt=2017, le=2030),
         user_id: Optional[int] = Query(None),
         service: WorkService = Depends(),
         current_user: User = Depends(get_current_user)
@@ -87,8 +87,8 @@ def delete_work(
 
 @router.get("/pay/{user_id}")
 def get_month_user_pay(
-        month: int = Path(..., qt=1, le=12),
-        year: int = Path(..., qt=2017, le=2030),
+        month: int = Query(qt=1, le=12),
+        year: int = Query(qt=2017, le=2030),
         user_id: Optional[int] = Query(None),
         service: WorkService = Depends(),
         user_service: StaffService = Depends(),
@@ -128,8 +128,8 @@ def get_reports(
 
 @router.get("/report", response_model=Report)
 def get_report(
-        month: Optional[int] = Path(default=None, qt=1, le=12),
-        year: Optional[int] = Path(default=None, qt=2017, le=2030),
+        month: Optional[int] = Query(default=None, qt=1, le=12),
+        year: Optional[int] = Query(default=None, qt=2017, le=2030),
         service: WorkService = Depends()
 ):
     """Запрос отчета за конкретный месяц"""
@@ -151,8 +151,8 @@ def get_pays(
 
 @router.get("/pay")
 def get_pay(
-        month: Optional[int] = Path(default=None, qt=1, le=12),
-        year: Optional[int] = Path(default=None, qt=2017, le=2030),
+        month: Optional[int] = Query(default=None, qt=1, le=12),
+        year: Optional[int] = Query(default=None, qt=2017, le=2030),
         service: WorkService = Depends()
 ):
     """Запрос отчета за конкретный месяц"""
