@@ -160,17 +160,17 @@ class WorkService:
 
         for report in report_works:
             if report.work_name == "Протокол python":
-                python_report += 1
+                python_report += report.count
             elif report.work_name == "Протокол по динамике python":
-                python_dynamic_report += 1
+                python_dynamic_report += report.count
             elif report.work_name == "Протокол по компрессии python":
-                python_compression_report += 1
+                python_compression_report += report.count
             elif report.work_name == "Ведомость физика":
-                physical_statement += 1
+                physical_statement += report.count
             elif report.work_name == "Ведомость механика":
-                mechanics_statement += 1
+                mechanics_statement += report.count
             elif report.work_name == "Протокол mathcad":
-                mathcad_report += 1
+                mathcad_report += report.count
 
         python_all = python_report + python_compression_report + python_dynamic_report
         python_percent = round((python_all / (python_all + mathcad_report)) * 100, 2)
