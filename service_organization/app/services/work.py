@@ -100,10 +100,17 @@ class WorkService:
 
         general_pay = pay["base"]
 
+        for key in report_works_pay:
+            general_pay += report_works_pay[key]["payment"]
+
+        for key in courses_works_pay:
+            general_pay += courses_works_pay[key]["payment"]
+
         if user.calculation_percent or user.developer_percent:
             works_all = self.get_month_work(month=month, year=year)
             pay_all = self.work_calc(works_all)
             pay["developer"] = self.dev_pay_calc(pay_all, user.developer_percent)
+            general_pay += pay["developer"]
 
         pay["general"] = general_pay
 
@@ -116,7 +123,7 @@ class WorkService:
         """Расчет базовой зарплаты через ставку и премию"""
         prize = self.session.query(tables.Prize).filter_by(date=datetime.date(year=year, month=month, day=25)).first()
         prize = prize.value if prize else 0
-        return round((prize/100 + 1) * rate, 2)
+        return round((prize/100 + 1) * rate * 1000, 2)
 
     def work_calc(self, works) -> dict:
         """Подсчет работ по категориям"""
