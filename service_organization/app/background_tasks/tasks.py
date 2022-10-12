@@ -201,6 +201,9 @@ def report_parser():
                 except TypeError:
                     continue
 
+                if not unit.engineer.strip():
+                    continue
+
                 yield WorkCreate(
                     user_id=user_dict[unit.engineer.strip()],
                     date=date,
@@ -380,7 +383,10 @@ def report_parser():
     statment_data = read_excel_statment(excel_path)
 
     for work in tqdm(get_works(statment_data)):
-        create(data=work)
+        try:
+            create(data=work)
+        except:
+            pass
 
 def parser(deelay=None):
 
