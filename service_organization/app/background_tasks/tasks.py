@@ -21,8 +21,9 @@ def staff_parser():
     try:
         wb = openpyexcel.load_workbook(settings.excel_staff)
         for i in tqdm(range(2, 50)):
-            name = wb["Лист1"]['B' + str(i)].value.strip()
+            name = wb["Лист1"]['B' + str(i)].value
             if name is not None:
+                name = name.strip()
                 password = wb["Лист1"]['C' + str(i)].value
                 phone_number = int(wb["Лист1"]['D' + str(i)].value) if wb["Лист1"]['F' + str(i)].value is not None else None
                 birthday = wb["Лист1"]['E' + str(i)].value
