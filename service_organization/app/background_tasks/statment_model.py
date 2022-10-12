@@ -41,10 +41,9 @@ class Unit:
             'mechanics_statement'
         ]:
             if work[key] != 0:
-                return [
-                    key,
-                    work[key]
-                ]
+                if key == 'plaxis_report':
+                    return ['python_report', work[key]]
+                return [key, work[key]]
         return
 
 

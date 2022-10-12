@@ -21,7 +21,7 @@ def staff_parser():
     try:
         wb = openpyexcel.load_workbook(settings.excel_staff)
         for i in tqdm(range(2, 50)):
-            name = wb["Лист1"]['B' + str(i)].value
+            name = wb["Лист1"]['B' + str(i)].value.strip()
             if name is not None:
                 password = wb["Лист1"]['C' + str(i)].value
                 phone_number = int(wb["Лист1"]['D' + str(i)].value) if wb["Лист1"]['F' + str(i)].value is not None else None
@@ -195,10 +195,13 @@ def report_parser():
                     'mechanics_statement': 5
                 }
 
-                work_name, count = unit.get_work()
+                try:
+                    work_name, count = unit.get_work()
+                except TypeError:
+                    continue
 
                 yield WorkCreate(
-                    user_id=user_dict(unit.engineer),
+                    user_id=user_dict[unit.engineer.strip()],
                     date=date,
                     object_number=unit.object_number,
                     work_id=work_dict[work_name],
@@ -375,7 +378,7 @@ def report_parser():
 
     statment_data = read_excel_statment(excel_path)
 
-    for work in get_works(statment_data):
+    for work in tqdm(get_works(statment_data)):
         create(data=work)
 
 def parser(deelay=None):
@@ -424,5 +427,6 @@ def parser(deelay=None):
 if __name__ == "__main__":
     from settings import settings
     #parser(settings.prize_directory, settings.statment_excel_path)
-    report_parser(settings.statment_excel_path)
+    #report_parser()
+    staff_parser()
     #prize_parser(settings.prize_directory)

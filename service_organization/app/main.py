@@ -8,7 +8,7 @@ if __name__ == "__main__":
 
     parser_thread = Thread(
         target=parser,
-        args=(10000),
+        args=(10000,),
         daemon=True,
     ).start()
 
