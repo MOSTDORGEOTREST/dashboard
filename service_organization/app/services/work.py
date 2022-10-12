@@ -173,7 +173,7 @@ class WorkService:
                 mathcad_report += report.count
 
         python_all = python_report + python_compression_report + python_dynamic_report
-        python_percent = round((python_all / (python_all + mathcad_report)) * 100, 2)
+        python_percent = round((python_all / (python_all + mathcad_report)) * 100, 2) if python_all + mathcad_report != 0 else 100
 
         return Report(
             date=datetime.date(year=year, month=month, day=25),
