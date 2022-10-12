@@ -176,6 +176,7 @@ class WorkService:
         python_percent = round((python_all / (python_all + mathcad_report)) * 100, 2)
 
         return Report(
+            date=datetime.date(year=year, month=month, day=25),
             python_report=python_report,
             python_dynamic_report=python_dynamic_report,
             python_compression_report=python_compression_report,
