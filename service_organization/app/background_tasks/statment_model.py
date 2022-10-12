@@ -40,11 +40,12 @@ class Unit:
             'physical_statement',
             'mechanics_statement'
         ]:
+            res = []
             if work[key] != 0:
                 if key == 'plaxis_report':
-                    return ['python_report', work[key]]
-                return [key, work[key]]
-        return
+                    res.append(['python_report', work[key]])
+                res.append([key, work[key]])
+        return res
 
 
 class XlsBook:

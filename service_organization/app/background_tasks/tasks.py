@@ -184,7 +184,6 @@ def report_parser():
                     'Шарунова А.А.': 20,
                     'Орлов М.С.': 38,
                     'Савенков Д.В.': 39,
-
                 }
 
                 work_dict = {
@@ -197,20 +196,23 @@ def report_parser():
                 }
 
                 try:
-                    work_name, count = unit.get_work()
+                    reoports = unit.get_work()
                 except TypeError:
                     continue
 
                 if not unit.engineer.strip():
                     continue
 
-                yield WorkCreate(
-                    user_id=user_dict[unit.engineer.strip()],
-                    date=date,
-                    object_number=unit.object_number,
-                    work_id=work_dict[work_name],
-                    count=count
-                )
+                for report in reoports:
+                    work_name, count = report
+
+                    yield WorkCreate(
+                        user_id=user_dict[unit.engineer.strip()],
+                        date=date,
+                        object_number=unit.object_number,
+                        work_id=work_dict[work_name],
+                        count=count
+                    )
 
     def read_excel_statment(path: str) -> 'ReportParser.data':
         __result: 'ReportParser.data' = {}
@@ -238,7 +240,7 @@ def report_parser():
         START_ROW = 6
 
         # if no last date in xls start date will be used
-        start_date = datetime(year=2017, month=2, day=1)
+        start_date = datetime(year=2022, month=1, day=1)
 
         last_date = None
         '''last defined in xls date is the last date overall'''
