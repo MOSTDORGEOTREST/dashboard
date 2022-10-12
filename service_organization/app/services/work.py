@@ -198,7 +198,7 @@ class WorkService:
     def get_reports(self, month_period: int) -> List[Report]:
         res = []
         for i in range(month_period):
-            current_date = datetime.today() - relativedelta(months=i)
+            current_date = datetime.date.today() - relativedelta(months=i)
             res.append(self.get_month_reports(month=current_date.month, year=current_date.year))
         return res
 
@@ -224,7 +224,7 @@ class WorkService:
     def get_pays(self, month_period: int) -> List[Report]:
         res = []
         for i in range(month_period):
-            current_date = datetime.today() - relativedelta(months=i)
+            current_date = datetime.date.today() - relativedelta(months=i)
             res.append(self.get_month_pay(month=current_date.month, year=current_date.year))
         return res
 
