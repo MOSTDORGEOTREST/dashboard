@@ -115,9 +115,8 @@ class WorkService:
     def get_base_pay(self, month: int, year: int, rate: float) -> float:
         """Расчет базовой зарплаты через ставку и премию"""
         prize = self.session.query(tables.Prize).filter_by(date=datetime.date(year=year, month=month, day=25)).first()
-        if not prize:
-            prize = 0
-        return round((prize.value/100 + 1) * rate, 2)
+        prize = prize.value if prize else 0
+        return round((prize/100 + 1) * rate, 2)
 
     def work_calc(self, works) -> dict:
         """Подсчет работ по категориям"""
