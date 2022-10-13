@@ -29,8 +29,10 @@ class Unit:
                 'python_report': self.python_report, 'python_dynamic_report': self.python_dynamic_report,
                 'plaxis_report': self.plaxis_report, 'physical_statement': self.physical_statement,
                 'mechanics_statement': self.mechanics_statement}
+
     def get_work(self):
         work = self.get_reports()
+        res = []
         for key in [
             'mathcad_report',
             'python_compression_report',
@@ -40,7 +42,6 @@ class Unit:
             'physical_statement',
             'mechanics_statement'
         ]:
-            res = []
             if work[key] != 0:
                 if key == 'plaxis_report':
                     res.append(['python_report', work[key]])

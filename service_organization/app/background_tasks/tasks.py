@@ -203,6 +203,9 @@ def report_parser():
                 if not unit.engineer.strip():
                     continue
 
+                if unit.object_number == 'СуммапротоколовкромеPythonДинамика':
+                    continue
+
                 for report in reoports:
                     work_name, count = report
 
@@ -233,7 +236,7 @@ def report_parser():
         PHYSICAL = 7  # Физика
 
         # local columns per engineer
-        N_COLS = 9
+        N_COLS = 9  # count from 1
         '''cols count per engineer'''
 
         # first month row
@@ -271,6 +274,12 @@ def report_parser():
                 return None
             return engineers[__col // N_COLS]
 
+        _now = datetime.now()
+        _start_year = 2022
+        _current_year = _now.year
+        _sheet_names = book.sheet_names()
+        _start_sheet_ind = _sheet_names.index(str(_start_year))
+        book.set_sheet_by_index(_start_sheet_ind)
         # start parsing for each sheet
         while not book.is_empty_sheet(min_rows=START_ROW, min_cols=N_COLS):
             # count sheet sizes
@@ -280,10 +289,10 @@ def report_parser():
             # fill-in engineers
             engineers = []
             for col in range(ncols):
-                curr_engineer = book.cell_value(engineers_row, col)
+                curr_engineer = book.cell_value(engineers_row, col).strip()
                 if curr_engineer in engineers:
                     continue
-                if len(curr_engineer) > 0:
+                if len(curr_engineer) > 0 and curr_engineer.replace(' ', '') != '':
                     engineers.append(curr_engineer)
             if len(engineers) < 1:  # no engineers = no data
                 return {}
@@ -354,7 +363,12 @@ def report_parser():
                                                     mechanics_statement=_mechanics_count))
 
             # and next sheet
-            book.set_next_sheet()
+            if _current_year > _start_year:
+                _start_year += 1
+                _sheet_ind = _sheet_names.index(str(_start_year))
+                book.set_sheet_by_index(_sheet_ind)
+            else:
+                break
 
         # recalculate dates
         if last_date:
