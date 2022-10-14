@@ -247,9 +247,9 @@ def report_parser(update_mode=False):
             object_number: str,
             work_id: int,
             count: int
-    ) -> tables.Report:
+    ) -> tables.Work:
         session = Session()
-        report = session.query(tables.Report).filter_by(
+        report = session.query(tables.Work).filter_by(
             user_id=user_id,
             date=date,
             object_number=object_number,
