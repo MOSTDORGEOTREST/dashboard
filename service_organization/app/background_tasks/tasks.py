@@ -448,11 +448,12 @@ def report_parser(update_mode=False):
         except:
             pass
 
-def parser(deelay=None, update_mode=False):
+def parser(deelay=None):
 
-    def f():
-        Base.metadata.drop_all(engine)
-        Base.metadata.create_all(engine)
+    def f(update_mode):
+        if not update_mode:
+            Base.metadata.drop_all(engine)
+            Base.metadata.create_all(engine)
 
         prize_dates = [
             date(year=dt.year, month=dt.month, day=25) for dt in rrule.rrule(
@@ -484,10 +485,10 @@ def parser(deelay=None, update_mode=False):
             logger.error("Ошибка обновления типов работ " + str(err))
 
     if not deelay:
-        f()
+        f(False)
     else:
         while True:
-            f()
+            f(True)
             time.sleep(deelay)
 
 

@@ -44,7 +44,7 @@ class Unit:
         ]:
             if work[key] != 0:
                 if key == 'plaxis_report':
-                    res.append(['python_report', work[key]])
+                    continue
                 res.append([key, work[key]])
         return res
 
