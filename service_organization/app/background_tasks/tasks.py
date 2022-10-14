@@ -165,36 +165,41 @@ def prize_parser(current_date: date = date.today()):
 
     update_run(_excel_directory, _prize, current_date)
 
-def report_parser():
-    def get_works(main_data):
-        for date in main_data:
+def report_parser(update_mode=False):
+    def get_works(main_data, datetime: datetime = None):
+        user_dict = {
+            'Баранов С.С.': 18,
+            'Денисова Л.Г.': 11,
+            'Жмылёв Д.А.': 8,
+            'Михайлов А.И.': 9,
+            'Михайлова Е.В.': 37,
+            'Михалева О.В.': 22,
+            'Селиванова О.С.': 34,
+            'Семенова О.В.': 15,
+            'Сергиенко В.В.': 33,
+            'Тишин Н.Р.': 2,
+            'Чалая Т.А.': 17,
+            'Шарунова А.А.': 20,
+            'Орлов М.С.': 38,
+            'Савенков Д.В.': 39,
+        }
+
+        work_dict = {
+            'mathcad_report': 6,
+            'python_compression_report': 3,
+            'python_report': 1,
+            'python_dynamic_report': 2,
+            'physical_statement': 4,
+            'mechanics_statement': 5
+        }
+
+        if datetime:
+            dates = [datetime]
+        else:
+            dates = main_data.keys()
+
+        for date in dates:
             for unit in main_data[date]:
-                user_dict = {
-                    'Баранов С.С.': 18,
-                    'Денисова Л.Г.': 11,
-                    'Жмылёв Д.А.': 8,
-                    'Михайлов А.И.': 9,
-                    'Михайлова Е.В.': 37,
-                    'Михалева О.В.': 22,
-                    'Селиванова О.С.': 34,
-                    'Семенова О.В.': 15,
-                    'Сергиенко В.В.': 33,
-                    'Тишин Н.Р.': 2,
-                    'Чалая Т.А.': 17,
-                    'Шарунова А.А.': 20,
-                    'Орлов М.С.': 38,
-                    'Савенков Д.В.': 39,
-                }
-
-                work_dict = {
-                    'mathcad_report': 6,
-                    'python_compression_report': 3,
-                    'python_report': 1,
-                    'python_dynamic_report': 2,
-                    'physical_statement': 4,
-                    'mechanics_statement': 5
-                }
-
                 try:
                     reoports = unit.get_work()
                 except TypeError:
@@ -209,13 +214,50 @@ def report_parser():
                 for report in reoports:
                     work_name, count = report
 
-                    yield WorkCreate(
-                        user_id=user_dict[unit.engineer.strip()],
-                        date=date,
-                        object_number=unit.object_number,
-                        work_id=work_dict[work_name],
-                        count=count
-                    )
+                    if datetime:
+                        from_db = _get(
+                            user_id=user_dict[unit.engineer.strip()],
+                            date=date,
+                            object_number=unit.object_number,
+                            work_id=work_dict[work_name],
+                            count=count
+                        )
+                        if not from_db:
+                            yield WorkCreate(
+                                user_id=user_dict[unit.engineer.strip()],
+                                date=date,
+                                object_number=unit.object_number,
+                                work_id=work_dict[work_name],
+                                count=count
+                            )
+                        else:
+                            continue
+                    else:
+                        yield WorkCreate(
+                            user_id=user_dict[unit.engineer.strip()],
+                            date=date,
+                            object_number=unit.object_number,
+                            work_id=work_dict[work_name],
+                            count=count
+                        )
+
+    def _get(
+            user_id: int,
+            date: date,
+            object_number: str,
+            work_id: int,
+            count: int
+    ) -> tables.Report:
+        session = Session()
+        report = session.query(tables.Report).filter_by(
+            user_id=user_id,
+            date=date,
+            object_number=object_number,
+            work_id=work_id,
+            count=count
+        ).first()
+        session.close()
+        return report
 
     def read_excel_statment(path: str) -> 'ReportParser.data':
         __result: 'ReportParser.data' = {}
@@ -398,13 +440,15 @@ def report_parser():
 
     statment_data = read_excel_statment(excel_path)
 
-    for work in tqdm(get_works(statment_data)):
+    d = datetime(year=date.today().year, month=date.today().month, day=1) if update_mode else None
+
+    for work in tqdm(get_works(statment_data, datetime=d)):
         try:
             create(data=work)
         except:
             pass
 
-def parser(deelay=None):
+def parser(deelay=None, update_mode=False):
 
     def f():
         Base.metadata.drop_all(engine)
@@ -422,7 +466,7 @@ def parser(deelay=None):
                 logger.error("Ошибка обновления премии " + str(err))
 
         try:
-            report_parser()
+            report_parser(update_mode)
             logger.info("successful update reports")
         except Exception as err:
             logger.error("Ошибка обновления отчетов " + str(err))
