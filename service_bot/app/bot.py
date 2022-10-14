@@ -157,7 +157,7 @@ async def pay(message: types.Message):
     if 'detail' in pay:
         await message.answer("Не найдено")
     else:
-        s = "\n".join([f"{key}: {pay[key]}" for key in pay.keys() if key != "date"])
+        s = f'Выплаты разаботчикам {pay["developer"]}'
         await message.answer(s)
 
 @dp.message_handler(commands=["pays"])
@@ -171,7 +171,7 @@ async def pays(message: types.Message):
     try:
         s = ""
         for pay in pays:
-            s += "\n".join([f"{key}: {pay[key]}" for key in pay.keys()]) + "\n\n\n"
+            s += "\n".join([f"{date}: {pay[date]}" for date in pay.keys()]) + "\n"
         await message.answer(s if s else "Не найдено")
     except:
         await message.answer("Не найдено")

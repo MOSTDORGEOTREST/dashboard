@@ -221,11 +221,11 @@ class WorkService:
             'developer': pay["developer"]
         }
 
-    def get_pays(self, month_period: int) -> List[Report]:
-        res = []
+    def get_pays(self, month_period: int) -> dict:
+        res = {}
         for i in range(month_period):
             current_date = datetime.date.today() - relativedelta(months=i)
-            res.append(self.get_month_pay(month=current_date.month, year=current_date.year))
+            res[current_date] = self.get_month_pay(month=current_date.month, year=current_date.year)
         return res
 
 
