@@ -1,5 +1,5 @@
 import datetime
-
+from fastapi.responses import JSONResponse
 from fastapi import APIRouter, Depends, Response, status, HTTPException, Query
 from typing import List, Optional
 from datetime import date
@@ -77,7 +77,9 @@ def delete_work(
     work = service.get(id)
     if work.user_id == current_user.id or current_user.is_superuser:
         service.delete(id=id)
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
+        content = {"message": "8====)"}
+        response = JSONResponse(content=content)
+        return response
     else:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
