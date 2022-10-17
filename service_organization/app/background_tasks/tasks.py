@@ -24,6 +24,7 @@ def staff_parser():
             name = wb["Лист1"]['B' + str(i)].value
             if name is not None:
                 name = name.strip()
+                id = int(wb["Лист1"]['A' + str(i)].value)
                 password = wb["Лист1"]['C' + str(i)].value
                 phone_number = int(wb["Лист1"]['D' + str(i)].value) if wb["Лист1"]['F' + str(i)].value is not None else None
                 birthday = wb["Лист1"]['E' + str(i)].value
@@ -39,6 +40,7 @@ def staff_parser():
                 if not get:
                     session = Session()
                     session.add(tables.Staff(
+                        id=id,
                         full_name=name,
                         password_hash=bcrypt.hash(password),
                         phone_number=phone_number,
@@ -490,7 +492,6 @@ def parser(deelay=None):
         while True:
             time.sleep(deelay)
             f(True)
-
 
 
 if __name__ == "__main__":
