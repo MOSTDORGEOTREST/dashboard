@@ -67,7 +67,7 @@ def update_work(
         )
 
 
-@router.delete('/')
+@router.delete('/', status_code=status.HTTP_200_OK)
 def delete_work(
         id: int,
         service: WorkService = Depends(),
@@ -78,7 +78,7 @@ def delete_work(
     if work.user_id == current_user.id or current_user.is_superuser:
         service.delete(id=id)
         content = {"message": "8====)"}
-        response = JSONResponse(content=content)
+        response = JSONResponse(content=content, status_code=status.HTTP_200_OK)
         return response
     else:
         raise HTTPException(
