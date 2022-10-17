@@ -488,8 +488,9 @@ def parser(deelay=None):
         f(False)
     else:
         while True:
-            f(True)
             time.sleep(deelay)
+            f(True)
+
 
 
 if __name__ == "__main__":
