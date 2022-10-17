@@ -67,7 +67,7 @@ def update_work(
         )
 
 
-@router.delete('/', status_code=status.HTTP_204_NO_CONTENT)
+@router.delete('/')
 def delete_work(
         id: int,
         service: WorkService = Depends(),
