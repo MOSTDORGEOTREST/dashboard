@@ -200,7 +200,7 @@ class WorkService:
         for i in range(month_period):
             current_date = datetime.date.today() - relativedelta(months=i)
             res.append(self.get_month_reports(month=current_date.month, year=current_date.year))
-        return res.reverse()
+        return res[::-1]
 
     def get_month_pay(self, month: int, year: int) -> dict:
         pay = self.get_month_user_pay(
