@@ -27,9 +27,11 @@ export default function Prize({ toSummary }) {
 				fetch(`${api}prizes/`)
 					.then((response) => response.json())
 					.then((data) => {
-						const resultData = parsePrizes(data)
-						setPrizes(resultData)
-						setChartLoaded(true)
+						if (data && Object.keys(data).length > 0) {
+							const resultData = parsePrizes(data)
+							setPrizes(resultData)
+							setChartLoaded(true)
+						}
 					})
 			}
 		}

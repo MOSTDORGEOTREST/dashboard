@@ -47,8 +47,8 @@
 	--login-height: 2.5rem;
 
 	/* grid gap */
-	--row-gap: 0.25rem;
-	--col-gap: 0.25rem;
+	--row-gap: 0.35rem;
+	--col-gap: 0.35rem;
 
 	/* z index */
 
@@ -138,8 +138,8 @@ img {
 	background-color: var(--container-color);
 	border-radius: 0.5rem;
 	/* border: none; */
-	box-shadow: 1px 0px 4px hsla(var(--hue), 24%, 15%, 0.1),
-		-1px 0px 4px hsla(var(--hue), 24%, 15%, 0.1);
+	box-shadow: 1px 0px 2px hsla(var(--hue), 24%, 15%, 0.1),
+		-1px 0px 2px hsla(var(--hue), 24%, 15%, 0.1);
 
 	/* max-width: 768px; */
 }

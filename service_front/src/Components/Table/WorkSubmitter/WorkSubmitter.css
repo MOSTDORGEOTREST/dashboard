@@ -1,0 +1,176 @@
+/* =================== ДЕСКТОПНАЯ ВЕРСИЯ =================== */
+/*
+ * Срока с добавлением
+*/
+.dynamic-table__row.dynamic-table__add-row {
+	position: relative;
+	height: 52px;
+	display: none;
+}
+.dynamic-table__row.dynamic-table__add-row.dynamic-table__add-row_show {
+	display: table-row;
+}
+
+.dynamic-table__row.dynamic-table__add-row > td {
+	/* position: relative; */
+	height: 52px;
+	overflow: visible;
+}
+
+.dynamic-table__add-row_bottom {
+	border-top: none;
+}
+
+.dynamic-table__input {
+	border: none;
+
+	padding: 0 5px;
+
+	border-radius: 0.25rem;
+	border: none;
+
+	/* cursor: pointer; */
+}
+.dynamic-table__input:focus-visible {
+	outline: 1px solid var(--text-color);
+	outline-offset: -1px;
+}
+.dynamic-table__add-row_show.error input {
+	outline: 1px solid var(--color-bad-info);
+	outline-offset: -1px;
+
+	animation-name: bounce;
+	animation-duration: 0.5s;
+	animation-delay: 0.25s;
+}
+
+.dynamic-table__row.dynamic-table__add-row .dynamic-table__input {
+	width: 100%;
+	height: 90%;
+}
+
+.dynamic-table__row.dynamic-table__add-row
+	.dynamic-table__input:not(:disabled) {
+	background-color: var(--body-color);
+}
+
+.dynamic-table__input:disabled {
+	background-color: transparent;
+	opacity: 0.6;
+}
+
+.dynamic-table__btns {
+	display: inline-flex;
+	column-gap: 0.5rem;
+}
+
+.dynamic-table__btns button {
+	font-size: var(--normal-font-size);
+
+	height: var(--login-height);
+	padding: 0.5rem 0.75rem;
+
+	border-radius: 0.5rem;
+
+	width: fit-content;
+}
+
+.dynamic-table__btns button:hover,
+.dynamic-table__btns button:focus-visible {
+	box-shadow: 3px 3px 4px hsla(var(--hue), 24%, 15%, 0.1),
+		-3px -3px 4px hsla(var(--hue), 24%, 15%, 0.1);
+}
+
+.dynamic-table__btns .dynamic-table__btn_submit:hover {
+	background-color: var(--first-color-alt);
+}
+
+.dynamic-table__btns .dynamic-table__btn_submit {
+	background-color: var(--first-color);
+	color: var(--container-color);
+}
+
+.dynamic-table__error {
+	position: absolute;
+	left: 50%;
+	transform: translate(-50%, -50%);
+
+	padding: 0.5rem 1rem;
+	border-radius: 0.25rem;
+	background-color: var(--color-bad-info);
+	color: #fff;
+}
+
+@keyframes bounce {
+	0% {
+		transform: translateX(0px);
+		timing-function: ease-in;
+	}
+	37% {
+		transform: translateX(5px);
+		timing-function: ease-out;
+	}
+	55% {
+		transform: translateX(-5px);
+		timing-function: ease-in;
+	}
+	73% {
+		transform: translateX(4px);
+		timing-function: ease-out;
+	}
+	82% {
+		transform: translateX(-4px);
+		timing-function: ease-in;
+	}
+	91% {
+		transform: translateX(2px);
+		timing-function: ease-out;
+	}
+	96% {
+		transform: translateX(-2px);
+		timing-function: ease-in;
+	}
+	100% {
+		transform: translateX(0px);
+		timing-function: ease-in;
+	}
+}
+
+/* =================== МОБИЛЬНАЯ ВЕРСИЯ =================== */
+.mobile-sbmtr__wrapper {
+	width: 100%;
+	min-height: fit-content;
+
+	display: flex;
+	flex-direction: column;
+	row-gap: calc(var(--row-gap) * 2);
+}
+
+.mobile-sbmtr__wrapper .mobile-sbmtr__input {
+	height: fit-content;
+	width: 100%;
+
+	display: flex;
+	flex-direction: column;
+}
+
+.mobile-sbmtr__wrapper .mobile-sbmtr__input .dynamic-table__input,
+.mobile-sbmtr__wrapper .auto {
+	height: 52px;
+	width: 100%;
+}
+
+.mobile-sbmtr__wrapper
+	> .mobile-sbmtr__input
+	.dynamic-table__input:not(:disabled) {
+	background-color: var(--body-color);
+}
+
+.mobile-sbmtr__wrapper.error input {
+	outline: 1px solid var(--color-bad-info);
+	outline-offset: -1px;
+
+	animation-name: bounce;
+	animation-duration: 0.5s;
+	animation-delay: 0.25s;
+}

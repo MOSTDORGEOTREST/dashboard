@@ -23,9 +23,10 @@ export default function LogInBar() {
 	const client = axios.create()
 	const requestCurrenUser = axios.create()
 
-	const { isLogged, setLogged, api } = useContext(Context)
+	const { isLogged, setLogged, api, userName, setUserName } = useContext(
+		Context
+	)
 
-	const [userName, setUserName] = useState('')
 	const [errClass, setErrClass] = useState('')
 
 	let pending = false
@@ -53,7 +54,7 @@ export default function LogInBar() {
 	requestCurrenUser.interceptors.response.use(
 		function(response) {
 			if (response.status === 200) {
-				setUserName(response.data.username)
+				setUserName(response.data.full_name)
 				setLogged(true)
 				setErrClass('')
 				clearInput()
@@ -67,7 +68,7 @@ export default function LogInBar() {
 		}
 	)
 	useEffect(() => {
-		requestCurrenUser.get(`${api}authorization/user/`)
+		requestCurrenUser.get(`${api}staff/user/`)
 	}, [])
 
 	function onFormSubmit(event) {
@@ -117,8 +118,8 @@ export default function LogInBar() {
 		)
 
 		client.post(
-			`${api}authorization/sign-in/`,
-			`username=${user.value()}&password=${password.value()}`
+			`${api}staff/sign-in/`,
+			`username=${encodeURI(user.value())}&password=${password.value()}`
 		)
 	}
 
@@ -126,7 +127,7 @@ export default function LogInBar() {
 		setLogged(false)
 		setUserName('')
 
-		fetch(`${api}authorization/sign-out/`, {
+		fetch(`${api}staff/sign-out/`, {
 			method: 'GET',
 			headers: {
 				accept: 'application/json',
