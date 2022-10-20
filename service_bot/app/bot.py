@@ -99,7 +99,7 @@ async def prize(message: types.Message):
         await message.answer(text="Сервер не отвечает " + emoji.emojize(":smiling_face_with_tear:"))
         return
 
-    await message.answer(f"{prize.get('prize', 0)} %")
+    await message.answer(f"{prize.get('value', 0)} %")
 
 @dp.message_handler(commands=["prizes"])
 async def prizes(message: types.Message):
@@ -110,7 +110,7 @@ async def prizes(message: types.Message):
         return
 
     try:
-        s = "".join([f"дата: {prize['date']} | премия: {prize['prize']}\n" for prize in prizes])
+        s = "".join([f"дата: {prize['date']} | премия: {prize['value']}\n" for prize in prizes])
         await message.answer(s if s else "Не найдено")
     except:
         await message.answer("Не найдено")
@@ -132,7 +132,7 @@ async def report(message: types.Message):
 @dp.message_handler(commands=["reports"])
 async def reports(message: types.Message):
     """Запрос истории отчетности"""
-    reports = await get_respones(f'{SERVER_URI}/works/reports/')
+    reports = await get_respones(f'{SERVER_URI}/works/reports?month_period=6')
     if reports is None:
         await message.answer(text="Сервер не отвечает " + emoji.emojize(":smiling_face_with_tear:"))
         return
@@ -163,7 +163,7 @@ async def pay(message: types.Message):
 @dp.message_handler(commands=["pays"])
 async def pays(message: types.Message):
     """Запрос статистики оплаты"""
-    pays = await get_respones_with_auth(f'{SERVER_URI}/works/pays/')
+    pays = await get_respones_with_auth(f'{SERVER_URI}/works/pays?month_period=6')
     if pays is None:
         await message.answer(text="Сервер не отвечает " + emoji.emojize(":smiling_face_with_tear:"))
         return
@@ -171,7 +171,7 @@ async def pays(message: types.Message):
     try:
         s = ""
         for pay in pays:
-            s += "\n".join([f"{date}: {pay[date]}" for date in pay.keys()]) + "\n"
+            s += "\n".join([f"{date}: {pay[date]['developer']}" for date in pay.keys()]) + "\n"
         await message.answer(s if s else "Не найдено")
     except:
         await message.answer("Не найдено")
@@ -245,7 +245,7 @@ async def scheduler():
         today = date.today()
         prize = await get_respones(f'{SERVER_URI}/prizes/{today.year}-{today.month}-25')
         try:
-            prize = prize.get('prize', 0)
+            prize = prize.get('value', 0)
             if prize != saved_prize:
                 saved_prize = prize
                 save_json_prize(prize)
