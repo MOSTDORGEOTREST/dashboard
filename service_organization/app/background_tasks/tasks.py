@@ -167,8 +167,8 @@ def prize_parser(current_date: date = date.today()):
 
     update_run(_excel_directory, _prize, current_date)
 
-def report_parser(update_mode=False):
-    def get_works(main_data, datetime: datetime = None):
+def report_parser():
+    def get_works(main_data):
         user_dict = {
             'Баранов С.С.': 18,
             'Денисова Л.Г.': 11,
@@ -216,7 +216,15 @@ def report_parser(update_mode=False):
                 for report in reoports:
                     work_name, count = report
 
-                    if datetime:
+                    yield WorkCreate(
+                        user_id=user_dict[unit.engineer.strip()],
+                        date=date,
+                        object_number=unit.object_number,
+                        work_id=work_dict[work_name],
+                        count=count
+                    )
+
+                    '''if datetime:
                         from_db = _get(
                             user_id=user_dict[unit.engineer.strip()],
                             date=date,
@@ -241,7 +249,7 @@ def report_parser(update_mode=False):
                             object_number=unit.object_number,
                             work_id=work_dict[work_name],
                             count=count
-                        )
+                        )'''
 
     def _get(
             user_id: int,
@@ -442,9 +450,7 @@ def report_parser(update_mode=False):
 
     statment_data = read_excel_statment(excel_path)
 
-    d = datetime(year=date.today().year, month=date.today().month, day=1) if update_mode else None
-
-    for work in tqdm(get_works(statment_data, datetime=d)):
+    for work in tqdm(get_works(statment_data)):
         try:
             create(data=work)
         except:
@@ -452,10 +458,9 @@ def report_parser(update_mode=False):
 
 def parser(deelay=None):
 
-    def f(update_mode):
-        if not update_mode:
-            Base.metadata.drop_all(engine)
-            Base.metadata.create_all(engine)
+    def f():
+        Base.metadata.drop_all(engine)
+        Base.metadata.create_all(engine)
 
         prize_dates = [
             date(year=dt.year, month=dt.month, day=25) for dt in rrule.rrule(
@@ -469,7 +474,7 @@ def parser(deelay=None):
                 logger.error("Ошибка обновления премии " + str(err))
 
         try:
-            report_parser(update_mode)
+            report_parser()
             logger.info("successful update reports")
         except Exception as err:
             logger.error("Ошибка обновления отчетов " + str(err))
@@ -487,11 +492,11 @@ def parser(deelay=None):
             logger.error("Ошибка обновления типов работ " + str(err))
 
     if not deelay:
-        f(False)
+        f()
     else:
         while True:
             time.sleep(deelay)
-            f(True)
+            f()
 
 
 if __name__ == "__main__":
