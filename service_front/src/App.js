@@ -16,6 +16,8 @@ function App() {
 
 	const [showScroll, setShowScroll] = useState(false)
 
+	const [userName, setUserName] = useState('')
+
 	useEffect(() => {
 		window.addEventListener('scroll', handleScroll)
 
@@ -42,6 +44,8 @@ function App() {
 					api_customers: api_customers.current,
 					hidedCards,
 					setHidedCards,
+					userName,
+					setUserName,
 				}}
 			>
 				<div className="content-wrapper">

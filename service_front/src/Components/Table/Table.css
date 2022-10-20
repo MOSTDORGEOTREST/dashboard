@@ -1,0 +1,256 @@
+:root {
+	--table-col-width: 240px;
+}
+
+/*
+ * Сама таблица
+*/
+
+.dynamic-table-item {
+	position: relative;
+
+	display: flex;
+	flex-direction: column;
+	width: fit-content;
+	max-width: 100%;
+	padding: 1.15rem 1.15rem 1.15rem 1.15rem;
+	row-gap: calc(var(--row-gap) * 4);
+
+	/* overflow-x: auto; */
+}
+
+.dynamic-table__wrapper {
+	display: inline-flex;
+	flex-direction: column;
+
+	width: fit-content;
+	height: fit-content;
+	min-height: 100px;
+
+	border: 1px solid var(--first-color-lighten);
+	border-radius: 4px;
+}
+
+.dynamic-table {
+	width: fit-content;
+	height: fit-content;
+
+	border-collapse: collapse;
+	/* white-space: nowrap; */
+	table-layout: fixed;
+}
+
+.dynamic-table__header {
+	display: inline-flex;
+	column-gap: 0.5rem;
+	row-gap: 0.5rem;
+
+	align-items: center;
+
+	flex-wrap: wrap;
+
+	white-space: nowrap;
+}
+
+.dynamic-table__header h1 {
+	white-space: normal;
+}
+
+.dynamic-table__header__buttons{
+	display: inline-flex;
+	column-gap: 0.5rem;
+
+	align-items: center;
+
+	flex-wrap: wrap;
+
+	white-space: nowrap;
+}
+
+.dynamic-table__header button {
+	background-color: transparent;
+	display: inline-flex;
+	border-radius: 0.25rem;
+	width: fit-content;
+	height: fit-content;
+
+	opacity: 0.6;
+}
+
+.dynamic-table__header button:hover,
+.dynamic-table__header button:focus-visible {
+	opacity: 1;
+}
+
+/*
+ * Заголовки и настройки строк
+*/
+.dynamic-table__head {
+	position: relative;
+}
+
+.dynamic-table__head,
+.dynamic-table__head th {
+	height: 64px;
+	min-height: 64px;
+}
+
+.dynamic-table__head th {
+	min-height: 100%;
+	text-align: left;
+	font-weight: var(--font-medium);
+}
+
+.dynamic-table__head th,
+.dynamic-table__row td {
+	padding-left: 16px;
+	padding-right: 16px;
+
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+
+	min-width: var(--table-col-width);
+	width: var(--table-col-width);
+}
+
+.dynamic-table__head th.date,
+.dynamic-table__row td.date {
+	min-width: 160px;
+	width: 160px;
+	max-width: 160px;
+}
+
+.dynamic-table__head th.half-width,
+.dynamic-table__row td.half-width {
+	min-width: 160px;
+	width: 160px;
+	max-width: 160px;
+}
+
+.dynamic-table__row {
+	/* position: relative; */
+
+	height: 52px;
+
+	border-top: 1px solid var(--first-color-lighten);
+}
+
+.dynamic-table__row td.dynamic-table__actions {
+	position: absolute;
+	right: 1.5rem;
+
+	display: inline-flex;
+	column-gap: 0.25rem;
+	align-items: center;
+	justify-content: center;
+
+	width: fit-content;
+	min-width: fit-content;
+	padding: 0.25rem 0.5rem;
+
+	transform: translate(-0%, 1px);
+
+	border-radius: 0.25rem;
+
+	background-color: var(--body-color);
+
+	color: var(--title-color);
+
+	display: none;
+
+	height: 50px;
+}
+
+.dynamic-table__row:hover td.dynamic-table__actions {
+	display: inline-flex;
+}
+
+.dynamic-table__row td.dynamic-table__actions.dynamic-table__actions_mobile {
+	display: inline-flex;
+}
+
+.dynamic-table__actions .dynamic-table__actions__del-btn,
+.dynamic-table__actions .dynamic-table__actions__edit-btn {
+	font-family: inherit;
+	font-size: inherit;
+	color: inherit;
+
+	padding: 0.25rem 0.75rem;
+
+	background-color: transparent;
+
+	opacity: 0.6;
+}
+
+.dynamic-table__actions .dynamic-table__actions__del-btn:hover:not(:disabled),
+.dynamic-table__actions
+	.dynamic-table__actions__del-btn:focus-visible:not(:disabled),
+.dynamic-table__actions .dynamic-table__actions__edit-btn:hover:not(:disabled),
+.dynamic-table__actions
+	.dynamic-table__actions__edit-btn:focus-visible:not(:disabled) {
+	opacity: 1;
+}
+
+.dynamic-table__actions .dynamic-table__actions__del-btn:disabled,
+.dynamic-table__actions .dynamic-table__actions__edit-btn:disabled {
+	opacity: 0.2;
+}
+
+/*
+ * Кнопка добавления
+*/
+.dynamic-table__add-btn {
+	display: inline-flex;
+	align-items: center;
+	position: absolute;
+	left: 50%;
+	transform: translate(-50%, -50%);
+
+	background-color: #fff;
+	padding: 0.25rem 0.5rem;
+	border-radius: 50%;
+
+	opacity: 0.8;
+
+	cursor: pointer;
+}
+.dynamic-table__add-btn.hidden {
+	display: none;
+}
+
+.dynamic-table__add-btn:hover {
+	opacity: 1;
+	color: var(--title-color);
+}
+.dynamic-table__add-btn:hover .plus-icon {
+	color: #fff;
+	background-color: var(--first-color);
+	border-radius: 50%;
+}
+.dynamic-table__add-btn td {
+	column-gap: 0.25rem;
+}
+.dynamic-table__add-btn td,
+.plus-icon {
+	display: inline-flex;
+	align-items: center;
+}
+.plus-icon {
+	padding: 0.2rem;
+}
+
+@media screen and (max-width: 1155px) {
+	.dynamic-table__wrapper {
+		max-width: 100%;
+		overflow-x: auto;
+	}
+}
+
+
+@media screen and (max-width: 425px) {
+	.dynamic-table__header__buttons {
+		width: 100%;
+		justify-content: center;
+	}
+}

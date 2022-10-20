@@ -39,7 +39,8 @@ ChartJS.register(
 		key1: { title: '', color: 'hsl(221, 24%, 32%)' },
 	}`
  */
-export default function ReportsChart({ dataset, reportsKeys, linesNames }) {
+
+export default function AccountCharts({ dataset, reportsKeys, linesNames }) {
 	const inputData = { reports: [...dataset.reports], dates: [...dataset.dates] }
 
 	const dates = [...inputData.dates]

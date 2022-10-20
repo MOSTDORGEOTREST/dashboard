@@ -24,7 +24,7 @@ export default function Reports({ toSummary }) {
 
 		function updateReportsChart() {
 			if (isLogged) {
-				fetch(`${api}reports/`)
+				fetch(`${api}works/reports/`)
 					.then((response) => response.json())
 					.then((data) => {
 						if (data && Object.keys(data).length > 0) {

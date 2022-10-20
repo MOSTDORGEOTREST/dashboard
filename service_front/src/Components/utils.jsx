@@ -10,7 +10,7 @@ export function parsePrizes(data) {
 
 	if (items.length > 0) {
 		items.forEach((item) => {
-			prizes.push(data[item].prize)
+			prizes.push(data[item].value)
 			lastDate = new Date(data[item].date)
 			const date = new Intl.DateTimeFormat('ru-RU', options)
 				.format(new Date(data[item].date))
@@ -18,19 +18,21 @@ export function parsePrizes(data) {
 
 			dates.push(date)
 		})
-	}
-	const currentDate = new Date()
-	if (currentDate.getMonth() > lastDate.getMonth()) {
-		prizes.push(0)
-		dates.push(
-			new Intl.DateTimeFormat('ru-RU', options)
-				.format(currentDate)
-				.replace(' г.', '')
-		)
+
+		const currentDate = new Date()
+		if (currentDate.getMonth() > lastDate.getMonth()) {
+			prizes.push(0)
+			dates.push(
+				new Intl.DateTimeFormat('ru-RU', options)
+					.format(currentDate)
+					.replace(' г.', '')
+			)
+		}
+		const resultData = { prizes: prizes, dates: dates }
+		return resultData
 	}
 
-	const resultData = { prizes: prizes, dates: dates }
-	return resultData
+	return { prizes: [], dates: [] }
 }
 
 export async function getPrizes() {
@@ -56,6 +58,24 @@ export async function login(username, password) {
 	return false
 }
 
+/**
+ * @param {[{}]} data Список со словарями из /works/reports 
+ * содержащий типы отчетов и их количества в виде:
+ * [
+  {
+    "date": "2022-10-25",
+    "python_report": 1613,
+    "python_dynamic_report": 1000254,
+    "python_compression_report": 0,
+    "mathcad_report": 0,
+    "physical_statement": 0,
+    "mechanics_statement": 0,
+    "python_all": 1001867,
+    "python_percent": 100
+  },
+ * ]
+ * @returns {{reports: reports, dates: dates }} resultData
+ */
 export function parseReports(data) {
 	const options = { year: 'numeric', month: 'short' }
 
