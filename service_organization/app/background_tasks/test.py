@@ -155,56 +155,86 @@ class XlsBook:
         return self.book.colour_map.get(color_index)
 
 
-def report_parser(excel_path):
+def report_parser():
     def get_works(main_data):
-        today = datetime.date.today()
-        date = datetime.datetime(year=today.year, month=today.month, day=1)
-        for unit in main_data[date]:
-            user_dict = {
-                'Баранов С.С.': 18,
-                'Денисова Л.Г.': 11,
-                'Жмылёв Д.А.': 8,
-                'Михайлов А.И.': 9,
-                'Михайлова Е.В.': 37,
-                'Михалева О.В.': 22,
-                'Селиванова О.С.': 34,
-                'Семенова О.В.': 15,
-                'Сергиенко В.В.': 33,
-                'Тишин Н.Р.': 2,
-                'Чалая Т.А.': 17,
-                'Шарунова А.А.': 20,
-                'Орлов М.С.': 38,
-                'Савенков Д.В.': 39,
-            }
+        user_dict = {
+            'Баранов С.С.': 18,
+            'Денисова Л.Г.': 11,
+            'Жмылёв Д.А.': 8,
+            'Михайлов А.И.': 9,
+            'Михайлова Е.В.': 37,
+            'Михалева О.В.': 22,
+            'Селиванова О.С.': 34,
+            'Семенова О.В.': 15,
+            'Сергиенко В.В.': 33,
+            'Тишин Н.Р.': 2,
+            'Чалая Т.А.': 17,
+            'Шарунова А.А.': 20,
+            'Орлов М.С.': 38,
+            'Савенков Д.В.': 39,
+        }
 
-            work_dict = {
-                'mathcad_report': 6,
-                'python_compression_report': 3,
-                'python_report': 1,
-                'python_dynamic_report': 2,
-                'physical_statement': 4,
-                'mechanics_statement': 5
-            }
+        work_dict = {
+            'mathcad_report': 6,
+            'python_compression_report': 3,
+            'python_report': 1,
+            'python_dynamic_report': 2,
+            'physical_statement': 4,
+            'mechanics_statement': 5
+        }
 
-            try:
-                reoports = unit.get_work()
-            except TypeError:
-                continue
+        dates = main_data.keys()
 
-            if not unit.engineer.strip():
-                continue
-            if unit.object_number == 'СуммапротоколовкромеPythonДинамика':
-                continue
+        for date in dates:
+            for unit in main_data[date]:
+                try:
+                    reoports = unit.get_work()
+                except TypeError:
+                    continue
 
-            for report in reoports:
-                work_name, count = report
+                if not unit.engineer.strip():
+                    continue
 
-                yield {
-                    'user_id': unit.engineer.strip(),
-                    'object_number': unit.object_number,
-                    'work_id': work_name,
-                    'count': count
-                }
+                if unit.object_number == 'СуммапротоколовкромеPythonДинамика':
+                    continue
+
+                for report in reoports:
+                    work_name, count = report
+
+                    yield WorkCreate(
+                        user_id=user_dict[unit.engineer.strip()],
+                        date=date,
+                        object_number=unit.object_number,
+                        work_id=work_dict[work_name],
+                        count=count
+                    )
+
+                    '''if datetime:
+                        from_db = _get(
+                            user_id=user_dict[unit.engineer.strip()],
+                            date=date,
+                            object_number=unit.object_number,
+                            work_id=work_dict[work_name],
+                            count=count
+                        )
+                        if not from_db:
+                            yield WorkCreate(
+                                user_id=user_dict[unit.engineer.strip()],
+                                date=date,
+                                object_number=unit.object_number,
+                                work_id=work_dict[work_name],
+                                count=count
+                            )
+                        else:
+                            continue
+                    else:
+                        yield WorkCreate(
+                            user_id=user_dict[unit.engineer.strip()],
+                            date=date,
+                            object_number=unit.object_number,
+                            work_id=work_dict[work_name],
+                            count=count
+                        )'''
 
     def read_excel_statment(path: str) -> 'ReportParser.data':
         __result: 'ReportParser.data' = {}
@@ -232,7 +262,7 @@ def report_parser(excel_path):
         START_ROW = 6
 
         # if no last date in xls start date will be used
-        start_date = datetime(year=2022, month=1, day=1)
+        start_date = datetime.datetime(year=2022, month=1, day=1)
 
         last_date = None
         '''last defined in xls date is the last date overall'''
@@ -240,14 +270,14 @@ def report_parser(excel_path):
         def next_month(_date):
             month = _date.month
             if month + 1 == 13:
-                return datetime(year=_date.year + 1, month=1, day=1)
-            return datetime(year=_date.year, month=month + 1, day=1)
+                return datetime.datetime(year=_date.year + 1, month=1, day=1)
+            return datetime.datetime(year=_date.year, month=month + 1, day=1)
 
         def prev_month(_date):
             month = _date.month
             if month - 1 == 0:
-                return datetime(year=_date.year - 1, month=12, day=1)
-            return datetime(year=_date.year, month=month - 1, day=1)
+                return datetime.datetime(year=_date.year - 1, month=12, day=1)
+            return datetime.datetime(year=_date.year, month=month - 1, day=1)
 
         # load book
         book = XlsBook(path)
@@ -263,7 +293,7 @@ def report_parser(excel_path):
                 return None
             return engineers[__col // N_COLS]
 
-        _now = datetime.now()
+        _now = datetime.datetime.now()
         _start_year = 2022
         _current_year = _now.year
         _sheet_names = book.sheet_names()
@@ -374,6 +404,9 @@ def report_parser(excel_path):
 
         return result
 
+
+    excel_path = '/Users/mac1/Desktop/projects/ПРОТОКОЛЫ+ведомости.xls'
+
     if not os.path.exists(excel_path):
         raise FileNotFoundError("Отсутствует файл отчетов")
 
@@ -382,10 +415,11 @@ def report_parser(excel_path):
     for work in tqdm(get_works(statment_data)):
         try:
             print(work)
+            # create(data=work)
         except:
             pass
 
 
 if __name__ == "__main__":
-    report_parser('/Users/mac1/Downloads/ПРОТОКОЛЫ+ведомости.xls')
+    report_parser()
     #prize_parser(settings.prize_directory)

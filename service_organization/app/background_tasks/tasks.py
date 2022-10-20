@@ -195,10 +195,7 @@ def report_parser():
             'mechanics_statement': 5
         }
 
-        if datetime:
-            dates = [datetime]
-        else:
-            dates = main_data.keys()
+        dates = main_data.keys()
 
         for date in dates:
             for unit in main_data[date]:
@@ -452,7 +449,8 @@ def report_parser():
 
     for work in tqdm(get_works(statment_data)):
         try:
-            create(data=work)
+            print(work)
+            #create(data=work)
         except:
             pass
 
