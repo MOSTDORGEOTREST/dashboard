@@ -265,7 +265,7 @@ async def scheduler():
         except TypeError:
             pass
 
-    aioschedule.every(10).minutes.do(check_prize)
+    aioschedule.every(60).minutes.do(check_prize)
     aioschedule.every().day.at("9:30").do(check_birthday)
 
     while True:
