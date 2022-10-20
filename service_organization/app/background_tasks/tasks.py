@@ -449,8 +449,7 @@ def report_parser():
 
     for work in tqdm(get_works(statment_data)):
         try:
-            print(work)
-            #create(data=work)
+            create(data=work)
         except:
             pass
 
