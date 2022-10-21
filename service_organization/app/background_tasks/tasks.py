@@ -209,7 +209,7 @@ def courses_parser():
             book = XlsBookCourses(current_path)
 
             for item in book.get_data():
-                print(item)
+                print(item.user_id)
                 try:
                     reoports = item.get_work()
                 except TypeError:
