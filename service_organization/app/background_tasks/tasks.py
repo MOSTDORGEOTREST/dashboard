@@ -73,6 +73,7 @@ def work_types_parser():
                     session = Session()
                     session.add(
                         tables.WorkType(
+                            id=id,
                             work_name=name,
                             price=price,
                             dev_tips=dev_tips,
@@ -203,7 +204,7 @@ def courses_parser():
             )]
 
         for d in dates:
-            current_path = names(d.year, d.month)
+            current_path = names(str(d.year), int(d.month))
             assert os.path.exists(current_path), f"Не существует файла {current_path}"
             book = XlsBookCourses(current_path)
 
