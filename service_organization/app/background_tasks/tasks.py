@@ -216,13 +216,15 @@ def courses_parser():
 
                 for report in reoports:
                     work_name, count = report
-
-                    print(WorkCreate(
-                        user_id=item.user_id,
-                        date=date,
-                        object_number="",
-                        work_id=work_dict[work_name],
-                        count=count))
+                    try:
+                        print(WorkCreate(
+                            user_id=item.user_id,
+                            date=date,
+                            object_number="",
+                            work_id=work_dict[work_name],
+                            count=count))
+                    except Exception as err:
+                        print(str(err))
 
     def create(data: WorkCreate) -> None:
         session = Session()
