@@ -209,7 +209,6 @@ def courses_parser():
             book = XlsBookCourses(current_path)
 
             for item in book.get_data():
-                print(item.user_id)
                 try:
                     reoports = item.get_work()
                 except TypeError:
@@ -218,12 +217,12 @@ def courses_parser():
                 for report in reoports:
                     work_name, count = report
 
-                    yield WorkCreate(
+                    print(WorkCreate(
                         user_id=item.user_id,
                         date=date,
                         object_number="",
                         work_id=work_dict[work_name],
-                        count=count)
+                        count=count))
 
     def create(data: WorkCreate) -> None:
         session = Session()
