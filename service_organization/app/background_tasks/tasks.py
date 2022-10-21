@@ -211,11 +211,13 @@ def courses_parser():
             for item in book.get_data():
                 try:
                     reoports = item.get_work()
+                    print(reoports)
                 except TypeError:
                     continue
 
                 for report in reoports:
                     work_name, count = report
+
                     try:
                         print(WorkCreate(
                             user_id=item.user_id,
