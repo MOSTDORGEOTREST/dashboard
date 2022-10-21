@@ -552,11 +552,11 @@ def parser(deelay=None):
         except Exception as err:
             logger.error("Ошибка обновления типов работ " + str(err))
 
-        try:
-            report_parser()
-            logger.info("successful update reports")
-        except Exception as err:
-            logger.error("Ошибка обновления отчетов " + str(err))
+        #try:
+         #   report_parser()
+         #   logger.info("successful update reports")
+        #except Exception as err:
+         #   logger.error("Ошибка обновления отчетов " + str(err))
 
         try:
             courses_parser()
