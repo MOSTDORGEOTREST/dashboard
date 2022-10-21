@@ -233,10 +233,10 @@ def courses_parser():
 
     for work in tqdm(get_works()):
         try:
-            create(data=work)
+            print(work)
+            #create(data=work)
         except:
             pass
-
 
 def report_parser():
     def get_works(main_data):
