@@ -211,22 +211,19 @@ def courses_parser():
             for item in book.get_data():
                 try:
                     reoports = item.get_work()
-                    print(reoports)
                 except TypeError:
                     continue
 
                 for report in reoports:
                     work_name, count = report
 
-                    try:
-                        print(WorkCreate(
+                    yield WorkCreate(
                             user_id=item.user_id,
-                            date=date,
+                            date=date(year=d.year, month=d.month, day=26),
                             object_number="",
                             work_id=work_dict[work_name],
-                            count=count))
-                    except Exception as err:
-                        print(str(err))
+                            count=count
+                        )
 
     def create(data: WorkCreate) -> None:
         session = Session()
