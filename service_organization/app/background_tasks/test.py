@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import datetime
 import xlrd
 from xlrd import open_workbook
+from dateutil import rrule
 
 @dataclass
 class Unit:
@@ -421,5 +422,29 @@ def report_parser():
 
 
 if __name__ == "__main__":
-    report_parser()
+    def names(month, year):
+        names = {
+            1: f'1.Январь_{year}_Учет техподдержки.xlsx',
+            2: f'2.Февраль_{year}_Учет техподдержки.xlsx',
+            3: f'3.Март_{year}_Учет техподдержки.xlsx',
+            4: f'4.Апрель_{year}_Учет техподдержки.xlsx',
+            5: f'5.Май_{year}_Учет техподдержки.xlsx',
+            6: f'6.Июнь_{year}_Учет техподдержки.xlsx',
+            7: f'7.Июль_{year}_Учет техподдержки.xlsx',
+            8: f'8.Август_{year}_Учет техподдержки.xlsx',
+            9: f'9.Сентябрь_{year}_Учет техподдержки.xlsx',
+            10: f'10.Октябрь_{year}_Учет техподдержки.xlsx',
+            11: f'11.Ноябрь_{year}_Учет техподдержки.xlsx',
+            12: f'12.Декабрь_{year}_Учет техподдержки.xlsx',
+        }
+        return names[month]
+
+
+    dates = [
+        datetime.date(year=dt.year, month=dt.month, day=1) for dt in rrule.rrule(
+            rrule.MONTHLY, dtstart=datetime.date(2022, 1, 1), until=datetime.date.today()
+        )]
+
+    for d in dates:
+        current_path = names(int(d.month), str(d.year))
     #prize_parser(settings.prize_directory)

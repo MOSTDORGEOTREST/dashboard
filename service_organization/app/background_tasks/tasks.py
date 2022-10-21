@@ -204,7 +204,7 @@ def courses_parser():
             )]
 
         for d in dates:
-            current_path = names(str(d.year), int(d.month))
+            current_path = names(int(d.month), str(d.year))
             assert os.path.exists(current_path), f"Не существует файла {current_path}"
             book = XlsBookCourses(current_path)
 
