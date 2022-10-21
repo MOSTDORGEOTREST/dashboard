@@ -11,6 +11,7 @@ from tqdm import tqdm
 
 from models.work import Work, WorkCreate
 from background_tasks.statment_model import XlsBook, Unit
+from background_tasks.courses_model import XlsBookCourses, UnitCourses
 from models.prize import Prize
 import db.tables as tables
 from db.tables import Base
@@ -61,11 +62,11 @@ def work_types_parser():
         wb = openpyexcel.load_workbook(settings.excel_work_types)
         for i in tqdm(range(2, 50)):
             name = wb["Лист1"]['A' + str(i)].value
-            if name is not None:
+            if name:
                 price = wb["Лист1"]['C' + str(i)].value
                 category = wb["Лист1"]['B' + str(i)].value
                 dev_tips = wb["Лист1"]['D' + str(i)].value
-
+                id = int(wb["Лист1"]['E' + str(i)].value)
                 session = Session()
                 get = session.query(tables.WorkType).filter_by(work_name=name).first()
                 if not get:
@@ -166,6 +167,74 @@ def prize_parser(current_date: date = date.today()):
         _prize = base_prize.prize
 
     update_run(_excel_directory, _prize, current_date)
+
+def courses_parser():
+    work_dict = {
+        'technical_administration': 7,
+        'infrastructure_administration': 8,
+        'contract_administration': 9,
+        'technical_support': 10,
+        'lecture': 11,
+        'another': 12,
+        'calculation': 13
+    }
+
+    def names(month, year):
+        names = {
+            1: f'1.Январь_{year}_Учет техподдержки.xlsx',
+            2: f'2.Февраль_{year}_Учет техподдержки.xlsx',
+            3: f'3.Март_{year}_Учет техподдержки.xlsx',
+            4: f'4.Апрель_{year}_Учет техподдержки.xlsx',
+            5: f'5.Май_{year}_Учет техподдержки.xlsx',
+            6: f'6.Июнь_{year}_Учет техподдержки.xlsx',
+            7: f'7.Июль_{year}_Учет техподдержки.xlsx',
+            8: f'8.Август_{year}_Учет техподдержки.xlsx',
+            9: f'9.Сентябрь_{year}_Учет техподдержки.xlsx',
+            10: f'10.Октябрь_{year}_Учет техподдержки.xlsx',
+            11: f'11.Ноябрь_{year}_Учет техподдержки.xlsx',
+            12: f'12.Декабрь_{year}_Учет техподдержки.xlsx',
+        }
+        return names[month]
+
+    def get_works():
+        dates = [
+            date(year=dt.year, month=dt.month, day=1) for dt in rrule.rrule(
+                rrule.MONTHLY, dtstart=date(2022, 1, 1), until=date.today()
+            )]
+
+        for d in dates:
+            current_path = names(d.year, d.month)
+            assert os.path.exists(current_path), f"Не существует файла {current_path}"
+            book = XlsBookCourses(current_path)
+
+            for item in book.get_data():
+                try:
+                    reoports = item.get_work()
+                except TypeError:
+                    continue
+
+                for report in reoports:
+                    work_name, count = report
+
+                    yield WorkCreate(
+                        user_id=item.user_id,
+                        date=date,
+                        object_number="",
+                        work_id=work_dict[work_name],
+                        count=count)
+
+    def create(data: WorkCreate) -> None:
+        session = Session()
+        session.add(tables.Work(**data.dict()))
+        session.commit()
+        session.close()
+
+    for work in tqdm(get_works()):
+        try:
+            create(data=work)
+        except:
+            pass
+
 
 def report_parser():
     def get_works(main_data):
@@ -471,12 +540,6 @@ def parser(deelay=None):
                 logger.error("Ошибка обновления премии " + str(err))
 
         try:
-            report_parser()
-            logger.info("successful update reports")
-        except Exception as err:
-            logger.error("Ошибка обновления отчетов " + str(err))
-
-        try:
             staff_parser()
             logger.info("successful update staff")
         except Exception as err:
@@ -487,6 +550,18 @@ def parser(deelay=None):
             logger.info("successful update work types")
         except Exception as err:
             logger.error("Ошибка обновления типов работ " + str(err))
+
+        try:
+            report_parser()
+            logger.info("successful update reports")
+        except Exception as err:
+            logger.error("Ошибка обновления отчетов " + str(err))
+
+        try:
+            courses_parser()
+            logger.info("successful update courses")
+        except Exception as err:
+            logger.error("Ошибка обновления курсов " + str(err))
 
     if not deelay:
         f()
