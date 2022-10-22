@@ -219,8 +219,8 @@ def courses_parser():
 
                     yield WorkCreate(
                             user_id=item.user_id,
-                            date=date(year=d.year, month=d.month, day=26),
-                            object_number="",
+                            date=date(year=d.year, month=d.month, day=25),
+                            object_number="-",
                             work_id=work_dict[work_name],
                             count=count
                         )
