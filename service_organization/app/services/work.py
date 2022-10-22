@@ -92,9 +92,13 @@ class WorkService:
         courses_works = self.get_month_work(month=month, year=year, user_id=user.id, category="Курсы")
         courses_works_pay = self.work_calc(courses_works)
 
+        calculations_works = self.get_month_work(month=month, year=year, user_id=user.id, category="Расчеты")
+        calculations_works_pay = self.work_calc(calculations_works)
+
         pay = {
             "reports": report_works_pay,
             "courses": courses_works_pay,
+            "calculations": calculations_works_pay,
             "base": self.get_base_pay(month=month, year=year, rate=user.rate)
         }
 
