@@ -89,8 +89,8 @@ def delete_work(
 
 @router.get("/pay/{user_id}")
 def get_month_user_pay(
-        month: int = Query(qt=1, le=12),
-        year: int = Query(qt=2017, le=2030),
+        month: Optional[int] = Query(None, qt=1, le=12),
+        year: Optional[int] = Query(None, qt=2017, le=2030),
         user_id: Optional[int] = Query(None),
         service: WorkService = Depends(),
         user_service: StaffService = Depends(),
@@ -99,6 +99,11 @@ def get_month_user_pay(
     """Расчет выплат сотрудника за месяц"""
     if user_id is None:
         user_id = current_user.id
+
+    if not month or not year:
+        today = datetime.date.today()
+        month = today.month
+        year = today.year
 
     if user_id == current_user.id:
         return service.get_month_user_pay(user=current_user, month=month, year=year)
