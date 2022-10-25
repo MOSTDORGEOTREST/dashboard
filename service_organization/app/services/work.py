@@ -57,7 +57,11 @@ class WorkService:
         q = (
             self.session
             .query(
-                tables.Work,
+                tables.Work.id,
+                tables.Work.date,
+                tables.Work.object_number,
+                tables.Work.count,
+                tables.Work.work_id,
                 tables.WorkType.work_name,
                 tables.WorkType.price)
             .join(
@@ -70,18 +74,17 @@ class WorkService:
             .order_by(extract('day', tables.Work.date))
             .all()
         )
-
         l = []
 
         for item in q:
             l.append(WorkPrint(
-                id=item[0].id,
-                date=item[0].date,
-                object_number=item[0].object_number,
-                work_name=item[1],
-                count=item[0].count,
-                price=item[2],
-                work_id=item[0].work_id
+                id=item[0],
+                date=item[1],
+                object_number=item[2],
+                count=item[3],
+                work_id=item[4],
+                work_name=item[5],
+                price=item[6],
             ))
         return l
 
