@@ -205,7 +205,8 @@ def courses_parser():
 
         for d in dates:
             current_path = f"{settings.courses_directory}{str(d.year)}/{names(int(d.month), str(d.year))}"
-            assert os.path.exists(current_path), f"Не существует файла {current_path}"
+            if not os.path.exists(current_path):
+                continue
             book = XlsBookCourses(current_path)
 
             for item in book.get_data():
@@ -216,7 +217,8 @@ def courses_parser():
 
                 for report in reoports:
                     work_name, count = report
-
+                    if not count:
+                        continue
                     yield WorkCreate(
                             user_id=item.user_id,
                             date=date(year=d.year, month=d.month, day=25),
@@ -233,8 +235,8 @@ def courses_parser():
 
     for work in tqdm(get_works()):
         try:
-            print(work)
-            #create(data=work)
+            pass
+            create(data=work)
         except:
             pass
 
@@ -540,6 +542,7 @@ def parser(deelay=None):
                 prize_parser(d_p)
             except Exception as err:
                 logger.error("Ошибка обновления премии " + str(err))
+        logger.info("successful update prizes")
 
         try:
             staff_parser()
@@ -553,11 +556,11 @@ def parser(deelay=None):
         except Exception as err:
             logger.error("Ошибка обновления типов работ " + str(err))
 
-        #try:
-         #   report_parser()
-         #   logger.info("successful update reports")
-        #except Exception as err:
-         #   logger.error("Ошибка обновления отчетов " + str(err))
+        try:
+            report_parser()
+            logger.info("successful update reports")
+        except Exception as err:
+            logger.error("Ошибка обновления отчетов " + str(err))
 
         try:
             courses_parser()
@@ -577,5 +580,6 @@ if __name__ == "__main__":
     from settings import settings
     #parser(settings.prize_directory, settings.statment_excel_path)
     #report_parser()
-    staff_parser()
+    #staff_parser()
+    courses_parser()
     #prize_parser(settings.prize_directory)

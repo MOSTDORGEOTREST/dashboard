@@ -17,7 +17,7 @@ class UnitCourses:
         return "\n".join([f'{el[0]}: {el[1]}' for el in self.get_work()])
 
     def get_work(self):
-        return [(key, self.__dict__[key]) for key in self.__dict__.keys()]
+        return [(key, self.__dict__[key]) for key in self.__dict__.keys() if key != "user_id"]
 
 
 class XlsBookCourses:
