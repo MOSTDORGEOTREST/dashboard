@@ -1,20 +1,26 @@
 from pydantic import BaseSettings
 import os
 
-conf = ['server', 'home']
+conf = ['server', 'linux', 'mac']
 
-config = conf[0]
+config = conf[2]
 
 if config == 'server':
     statment_path = "/files/МДГТ - (Учет рабоч. времени, Отпуск, Даты рожд., телефоны, план работ)/ПРОТОКОЛЫ+ведомости.xls"
     prize_dir = "/files/МДГТ - (Учет рабоч. времени, Отпуск, Даты рожд., телефоны, план работ)/УЧЕТ рабочего времени/"
     db_path = "/databases/organization/"
     courses_dir = "/files/КУРСЫ ПОВЫШЕНИЯ КВАЛИФИКАЦИИ МДГТ/1. Заявки, Регистрация слушателей, Учет Договоров/Выплаты по курсам/"
-elif config == 'home':
+elif config == 'linux':
     statment_path = "/run/user/1000/gvfs/smb-share:server=192.168.0.1,share=files/МДГТ - (Учет рабоч. времени, Отпуск, Даты рожд., телефоны, план работ)//ПРОТОКОЛЫ+ведомости.xls"
     prize_dir = "/run/user/1000/gvfs/smb-share:server=192.168.0.1,share=files/МДГТ - (Учет рабоч. времени, Отпуск, Даты рожд., телефоны, план работ)/УЧЕТ рабочего времени/"
     db_path = "/home/tnick/databases/organization/"
     courses_dir = "/run/user/1000/gvfs/smb-share:server=192.168.0.1,share=files/КУРСЫ ПОВЫШЕНИЯ КВАЛИФИКАЦИИ МДГТ/1. Заявки, Регистрация слушателей, Учет Договоров/Выплаты по курсам/"
+elif config == 'mac':
+    statment_path = "/Users/mac1/Desktop/projects/databases/organization/ПРОТОКОЛЫ+ведомости.xls"
+    prize_dir = "/Users/mac1/Desktop/projects/databases/prize/"
+    db_path = "/Users/mac1/Desktop/projects/databases/organization/"
+    courses_dir = "/Users/mac1/Desktop/projects/databases/courses/"
+
 
 class Settings(BaseSettings):
     server_host: str = "0.0.0.0"
