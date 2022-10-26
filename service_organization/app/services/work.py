@@ -113,7 +113,10 @@ class WorkService:
         for key in courses_works_pay:
             general_pay += courses_works_pay[key]["payment"]
 
-        if user.calculation_percent or user.developer_percent:
+        for key in courses_works_pay:
+            general_pay += courses_works_pay[key]["payment"]
+
+        if user.developer_percent:
             works_all = self.get_month_work(month=month, year=year)
             pay_all = self.work_calc(works_all)
             pay["developer"] = self.dev_pay_calc(pay_all, user.developer_percent)
