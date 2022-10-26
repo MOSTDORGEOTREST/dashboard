@@ -169,3 +169,12 @@ def get_pay(
         year = current_date.year
     return service.get_month_pay(month=month, year=year)
 
+
+@router.put('/check_exsistance')
+def check_exsistance(
+        data: WorkUpdate,
+        service: WorkService = Depends()
+):
+    """Проверка существования работы"""
+    return service.check_exsistance(data=data)
+

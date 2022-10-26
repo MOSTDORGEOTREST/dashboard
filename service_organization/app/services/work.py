@@ -235,6 +235,16 @@ class WorkService:
             res[current_date] = self.get_month_pay(month=current_date.month, year=current_date.year)
         return res
 
+    def check_exsistance(self, data: WorkCreate):
+        work = self.session.query(tables.Work).filter_by(
+            object_number=data.object_number,
+            work_id=data.work_id,
+            count=data.count
+        ).first()
+        if not work:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        return work.date
+
 
 
 
