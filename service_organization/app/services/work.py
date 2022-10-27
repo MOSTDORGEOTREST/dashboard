@@ -121,6 +121,8 @@ class WorkService:
             pay_all = self.work_calc(works_all)
             pay["developer"] = self.dev_pay_calc(pay_all, user.developer_percent)
             general_pay += pay["developer"]
+        else:
+            pay["developer"] = 0
 
         pay["general"] = general_pay
 
