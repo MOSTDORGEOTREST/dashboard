@@ -31,7 +31,7 @@ async def get_respones_with_auth(url: str, username: str, password: str):
     jar = aiohttp.CookieJar(unsafe=True)
     try:
         async with aiohttp.ClientSession(cookie_jar=jar) as session:
-            res = await session.post(f'{configs.SERVER_URI}/authorization/sign-in/',
+            res = await session.post(f'{configs.SERVER_URI}/staff/sign-in/',
                                      data={
                                          "username": username,
                                          "password": password,
@@ -43,6 +43,26 @@ async def get_respones_with_auth(url: str, username: str, password: str):
             await res.json()
 
             async with session.get(url) as resp:
+                return await resp.json()
+    except aiohttp.client_exceptions.ClientConnectorError:
+        return None
+
+async def get_auth(username: str, password: str):
+    jar = aiohttp.CookieJar(unsafe=True)
+    try:
+        async with aiohttp.ClientSession(cookie_jar=jar) as session:
+            res = await session.post(f'{configs.SERVER_URI}/staff/sign-in/',
+                                     data={
+                                         "username": username,
+                                         "password": password,
+                                         "grant_type": "password",
+                                         "scope": "",
+                                         "client_id": "",
+                                         "client_secret": ""
+                                     }, allow_redirects=False)
+            await res.json()
+
+            async with session.get(f'{configs.SERVER_URI}/staff/user/') as resp:
                 return await resp.json()
     except aiohttp.client_exceptions.ClientConnectorError:
         return None

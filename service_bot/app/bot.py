@@ -9,7 +9,7 @@ import aioschedule
 import emoji
 
 from functions import save_json_prize, read_json_prize, get_respones, get_respones_with_auth, \
-    download_content_as_bytes, str_pay
+    download_content_as_bytes, str_pay, get_auth
 from config import configs
 from massages import Massages
 from utils import States
@@ -34,14 +34,13 @@ async def first_state_case_met(message: types.Message):
     }
     state = dp.current_state(user=message.from_user.id)
     await state.set_state(States.all()[2])
-    await message.reply('Введите пароль', reply=False)
+    await message.reply('Введите пароль:', reply=False)
 
 
 @dp.message_handler(state=States.STATE_2)
 async def second_state_case_met(message: types.Message):
     users_logins[message.from_user.id]['password'] = message.text
-    register = await get_respones_with_auth(
-            url=f'{configs.SERVER_URI}/staff/sign-in',
+    register = await get_auth(
             username=users_logins[message.from_user.id]['username'],
             password=users_logins[message.from_user.id]['password']
         )
@@ -51,7 +50,11 @@ async def second_state_case_met(message: types.Message):
         return
 
     if 'detail' in register:
-        await message.answer("Попробуйте еще раз")
+        users_logins.pop(message.from_user.id)
+        await message.answer("Неправильный логин или пароль " + emoji.emojize(":smiling_face_with_tear:"))
+    else:
+        users_logins[message.from_user.id]['id'] = register["id"]
+        await message.answer(emoji.emojize("Успешная авторизация\nДля доступа к выплатам используйте команду /pay"))
 
     state = dp.current_state(user=message.from_user.id)
     await state.reset_state()
@@ -130,9 +133,10 @@ async def pay(message: types.Message):
         state = dp.current_state(user=message.from_user.id)
         await state.set_state(States.all()[1])
         await message.answer("Для этого запроса нужна авторизация, введите имя пользователя:")
+        return
     else:
         pay = await get_respones_with_auth(
-            url=f'{configs.SERVER_URI}/works/pay/',
+            url=f'{configs.SERVER_URI}/works/pay/{str(user["id"])}',
             username=user['username'],
             password=user['password']
         )
@@ -142,8 +146,10 @@ async def pay(message: types.Message):
             return
 
         if 'detail' in pay:
-            await message.answer("Ошибка авторизации(")
             users_logins.pop(message.from_user.id)
+            state = dp.current_state(user=message.from_user.id)
+            await state.set_state(States.all()[1])
+            await message.answer("Для этого запроса нужна авторизация, введите имя пользователя:")
         else:
             s = str_pay(pay)
             await message.answer(s)
@@ -278,6 +284,6 @@ if __name__ == '__main__':
     executor.start_polling(
         dp,
         skip_updates=False,
-        #on_startup=on_startup,
+        on_startup=on_startup,
         on_shutdown=shutdown
     )
