@@ -282,10 +282,8 @@ export default function Account({ toSummary }) {
 			const _generalReports = []
 			const _generalPaysDates = []
 			const date = new Date()
-			date.setMonth(date.getMonth() - month[0])
 
-			for (const i of month) {
-				const date = new Date()
+			for (const i of month) {				
 				date.setMonth(date.getMonth() - i)
 				await paymentsRequestor
 					.get(
@@ -342,7 +340,6 @@ export default function Account({ toSummary }) {
 								const _date = new Intl.DateTimeFormat('ru-RU', options)
 									.format(date)
 									.replace(' г.', '')
-								console.log(_date)
 
 								_generalPaysDates.push(_date)
 							}
