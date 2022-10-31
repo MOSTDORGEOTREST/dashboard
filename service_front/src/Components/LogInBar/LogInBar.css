@@ -60,7 +60,7 @@
 	font-size: var(--normal-font-size);
 	/* font-weight: var(--font-semi-bold); */
 
-	width: 90px;
+	min-width: 90px;
 }
 
 .form-submit:hover {

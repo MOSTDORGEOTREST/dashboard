@@ -11,7 +11,8 @@
 
 	display: flex;
 	flex-direction: column;
-	width: fit-content;
+	width: 100%;
+
 	max-width: 100%;
 	padding: 1.15rem 1.15rem 1.15rem 1.15rem;
 	row-gap: calc(var(--row-gap) * 4);
@@ -23,7 +24,7 @@
 	display: inline-flex;
 	flex-direction: column;
 
-	width: fit-content;
+	width: 100%;
 	height: fit-content;
 	min-height: 100px;
 
@@ -111,7 +112,7 @@
 	text-overflow: ellipsis;
 
 	min-width: var(--table-col-width);
-	width: var(--table-col-width);
+	width: 100%;
 }
 
 .dynamic-table__head th.date,
@@ -241,10 +242,21 @@
 }
 
 @media screen and (max-width: 1155px) {
+	.dynamic-table-item {
+		width: fit-content;
+	}
+
 	.dynamic-table__wrapper {
 		max-width: 100%;
 		overflow-x: auto;
+		width: fit-content;
 	}
+
+	.dynamic-table__head th,
+      .dynamic-table__row td {
+	      width: var(--table-col-width);
+      }
+
 }
 
 

@@ -18,7 +18,9 @@ export default function Account({ toSummary }) {
 	const [payments, setPayments] = useState({
 		reports: [],
 		courses: [],
+		calculations: [],
 		developer: 0,
+		base: 0,
 	})
 
 	// Выплаты по пользоватлю за последние 6 месяцев из /works/pay
@@ -30,6 +32,7 @@ export default function Account({ toSummary }) {
 		rate: 0,
 		calculation_percent: 0,
 		developer_percent: 0,
+		is_superuser: false,
 	})
 
 	//
@@ -50,7 +53,7 @@ export default function Account({ toSummary }) {
 	const [tableLoaded, setTableLoaded] = useState(false)
 
 	//
-	const [reports, setReports] = useState({ reports: [], dates: [] })
+	const [reports, setReports] = useState({ reports: [], dates: [], calculations: []})
 
 	//
 	const [paysLoaded, setPaysLoaded] = useState(false)
@@ -69,7 +72,9 @@ export default function Account({ toSummary }) {
 			setPayments({
 				reports: [],
 				courses: [],
+				calculations: [],
 				developer: 0,
+				base:0,
 			})
 			setGeneralPays({ prizes: [], dates: [] })
 
@@ -146,6 +151,18 @@ export default function Account({ toSummary }) {
 					})
 					.then((_accountData) => {
 						if (_accountData) {
+							// Здесь происходит запонение payments
+							// Структура ответа от сервера:
+							/**
+							 * {
+								"reports": {},
+								"courses": {},
+								"calculations": {},
+								"base": 121600,
+								"developer": 0,
+								"general": 121600
+								}
+							 */
 							paymentsRequestor
 								.get(
 									`${api}works/pay/${
@@ -193,6 +210,17 @@ export default function Account({ toSummary }) {
 											} else {
 												_payments['courses'] = 0
 											}
+
+											if (Object.keys(data).includes('calculations')) {
+												let _calculations_summ = 0
+												Object.keys(data.calculations).forEach((report_type) => {
+													_calculations_summ += data.calculations[report_type].payment
+												})
+												_payments['calculations'] = _calculations_summ
+											} else {
+												_payments['calculations'] = 0
+											}
+
 											setPayments(_payments)
 											setAccountLoaded(true)
 										}
@@ -257,6 +285,8 @@ export default function Account({ toSummary }) {
 			for (const i of month) {
 				const date = new Date()
 				date.setMonth(date.getMonth() - i)
+				console.log(date.getMonth())
+				console.log(i)
 				await paymentsRequestor
 					.get(
 						`${api}works/pay/${accountData.id}?month=${date.getMonth() +
@@ -296,12 +326,23 @@ export default function Account({ toSummary }) {
 									_generalPays_item['courses'] = 0
 								}
 
+								if (Object.keys(data).includes('calculations')) {
+									let _calculations_summ = 0
+									Object.keys(data.calculations).forEach((report_type) => {
+										_calculations_summ += data.calculations[report_type].payment
+									})
+									_generalPays_item['calculations'] = _calculations_summ
+								} else {
+									_generalPays_item['calculations'] = 0
+								}
+
 								_generalReports.push(_generalPays_item)
 
 								const options = { year: 'numeric', month: 'short' }
 								const _date = new Intl.DateTimeFormat('ru-RU', options)
 									.format(date)
 									.replace(' г.', '')
+								console.log(_date)
 
 								_generalPaysDates.push(_date)
 							}
@@ -388,6 +429,7 @@ export default function Account({ toSummary }) {
 		courses: { title: 'Курсы', color: 'hsl(221, 24%, 32%)' },
 		developer: { title: 'Разработка', color: '#3D84A8' },
 		reports: { title: 'Отчеты', color: '#46CDCF' },
+		calculations: { title: 'Расчеты', color: "#ffb703"}
 	}
 
 	return isLogged ? (
@@ -415,10 +457,62 @@ export default function Account({ toSummary }) {
 							<h3 className="account__general-value">{`${accountData.developer_percent}%`}</h3>
 							<div className="account__general-sub">От разработки</div>
 						</div>
+
+						{/* /** ========================== СОЗДАНИЕ КНОПКИ  ========================== *-/ */}
+						{/* {accountData.is_superuser?<div className='account__general-item'>
+							<button type="submit" className="form-submit" onClick={(event)=>{
+								event.preventDefault()
+								event.stopPropagation()
+								
+								const paymentsRequestor = axios.create()
+								paymentsRequestor.interceptors.request.use(
+									(config) => {
+										// Код, необходимый до отправки запроса
+										config.method = 'get'
+										config.withCredentials = true
+										return config
+									},
+									(error) => {
+										// Обработка ошибки из запроса
+										return Promise.reject(error)
+									}
+								)
+								paymentsRequestor.interceptors.response.use(
+									function(response) {
+										return response
+									},
+									function(error) {
+										// Do something with response error
+										if (error.response.status === 401) {
+											setLogged(false)
+										}
+										return { data: null }
+									}
+								)
+								
+								paymentsRequestor.get(`${api}filepath/`).then((response)=>{
+									if (response.ok) {
+										response.blob().then((response_data)=>{
+											if (response_data) {
+												const a = document.createElement('a')
+												a.href = window.URL.createObjectURL(response_data)
+												a.target = '_blank'
+												a.download = 'file_name'
+												a.click()
+											}
+										})
+									}
+								})
+
+							}}>СКАЧАТЬ</button>
+						</div> : null} */}
+						{/* /** ========================== СОЗДАНИЕ КНОПКИ  ==========================*-/ */}
+
 					</div>
 				) : null}
 
 				<div className="account__pays-wrapper">
+					{/* Положения задаются фиксированной сеткой в css  */}
 					<DisplayCard
 						title="Выплата"
 						prize={accountLoaded ? payments.general : 0}
@@ -429,6 +523,20 @@ export default function Account({ toSummary }) {
 					<DisplayCard
 						title="Протоколы"
 						prize={accountLoaded ? payments.reports : 0}
+						date={currentDate}
+						chartLoaded={accountLoaded}
+						closeBtn={false}
+					/>
+					<DisplayCard
+						title="Базовая выплата"
+						prize={accountLoaded ? payments.base : 0}
+						date={currentDate}
+						chartLoaded={accountLoaded}
+						closeBtn={false}
+					/>
+					<DisplayCard
+						title="Расчеты"
+						prize={accountLoaded ? payments.calculations : 0}
 						date={currentDate}
 						chartLoaded={accountLoaded}
 						closeBtn={false}
@@ -467,7 +575,7 @@ export default function Account({ toSummary }) {
 							<AccountCharts
 								dataset={reports}
 								linesNames={linesNames}
-								reportsKeys={['courses', 'developer', 'reports']}
+								reportsKeys={['courses', 'developer', 'reports', 'calculations']}
 							/>
 						) : (
 							<div className="blank-page-ar-2"></div>
