@@ -285,7 +285,7 @@ export default function Account({ toSummary }) {
 			date.setMonth(date.getMonth() - month[0])
 
 			for (const i of month) {
-				date.setMonth(date.getMonth() - i)
+				date.setMonth(date.getMonth() + 1)				
 				await paymentsRequestor
 					.get(
 						`${api}works/pay/${accountData.id}?month=${date.getMonth() +
