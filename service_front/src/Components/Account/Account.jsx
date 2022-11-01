@@ -277,7 +277,7 @@ export default function Account({ toSummary }) {
 		)
 
 		async function getGeneralPays() {
-			const month = [6, 5, 4, 3, 2, 1, 0]
+			const month = [7, 6, 5, 4, 3, 2]
 			const _generalPaysPrizes = []
 			const _generalReports = []
 			const _generalPaysDates = []
@@ -285,7 +285,7 @@ export default function Account({ toSummary }) {
 			date.setMonth(date.getMonth() - month[0])
 
 			for (const i of month) {
-				date.setMonth(date.getMonth() + 1)				
+				date.setMonth(date.getMonth() + 1)
 				await paymentsRequestor
 					.get(
 						`${api}works/pay/${accountData.id}?month=${date.getMonth() +
