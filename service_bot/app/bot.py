@@ -259,7 +259,7 @@ async def scheduler():
                 if staff == "detail":
                     return
                 await bot.send_message(configs.MDGT_CHANNEL_ID,
-                                      text=Massages.happy_birthday_massage(staff["full_name"], staff["phone"]))
+                                      text=Massages.happy_birthday_massage(staff["full_name"], staff["phone_number"]))
         except TypeError:
             pass
 

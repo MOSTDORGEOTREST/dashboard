@@ -1,6 +1,7 @@
 import json
 import os
 import aiohttp
+import humanize
 
 from config import configs
 
@@ -83,10 +84,10 @@ def str_pay(pay):
         if len(pay[pay_name]) else 0
 
     str_pay = {
-        'Общая сумма': pay["general"],
-        'Выплата за протоколы': get_pay_by_name("reports"),
-        'Выплата за курсы': get_pay_by_name("courses"),
-        'Выплата за разработку': pay["developer"],
-        'Выплата за расчеты': get_pay_by_name("calculations"),
+        'Общая сумма': humanize.intcomma(int(pay["general"])),
+        'Выплата за протоколы': humanize.intcomma(int(get_pay_by_name("reports"))),
+        'Выплата за курсы': humanize.intcomma(int(get_pay_by_name("courses"))),
+        'Выплата за разработку': humanize.intcomma(int(pay["developer"])),
+        'Выплата за расчеты': humanize.intcomma(int(get_pay_by_name("calculations"))),
     }
     return "\n".join([f'{key}: {str_pay[key]}' for key in str_pay.keys()])
