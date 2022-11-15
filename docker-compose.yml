@@ -23,6 +23,15 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
 
+  service_control:
+    build: ./service_control/
+    container_name: service_control
+    ports:
+      - 8500:8500
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
   web:
     build: ./service_front/
     container_name: web
