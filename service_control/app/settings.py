@@ -2,7 +2,7 @@ from pydantic import BaseSettings
 
 conf = ['server', 'linux', 'mac']
 
-config = conf[2]
+config = conf[0]
 
 if config == 'server':
     db_path = "/databases/organization/"
