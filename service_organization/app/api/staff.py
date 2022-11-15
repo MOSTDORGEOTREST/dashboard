@@ -74,17 +74,10 @@ def get_staff(
 @router.get("/{name}", response_model=List[User])
 def get_user(
         name: str,
-        service: StaffService = Depends(),
-        current_user: User = Depends(get_current_user)
+        service: StaffService = Depends()
 ):
     """Запрос осотрудника по имени"""
-    if current_user.is_superuser:
-        return service.get(name)
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Только для суперюзера",
-        )
+    return service.get(name)
 
 
 @router.post("/", response_model=User)
