@@ -207,7 +207,7 @@ async def echo(message: types.Message):
             return
 
         try:
-            s = "".join([f"{staff['full_name']} | {staff['phone']}\n" for staff in staffs])
+            s = "".join([f"{staff['full_name']} | {staff['phone_number']}\n" for staff in staffs])
             await message.answer(s if s else "Не найдено")
         except:
             await message.answer("Не найдено")
