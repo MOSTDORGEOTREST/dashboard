@@ -29,6 +29,7 @@ services:
     ports:
       - 8500:8500
     volumes:
+      - /home/user_bot/databases/:/databases
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
 
