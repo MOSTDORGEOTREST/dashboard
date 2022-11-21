@@ -227,18 +227,21 @@ def courses_parser():
                             count=count
                         )
 
-    def create(data: WorkCreate) -> None:
+    def bulk(data_list: list) -> None:
         session = Session()
-        session.add(tables.Work(**data.dict()))
+        session.bulk_save_objects(data_list)
         session.commit()
         session.close()
 
+    works = []
+
     for work in tqdm(get_works()):
         try:
-            pass
-            create(data=work)
+            works.append(tables.Work(**work.dict()))
         except:
             pass
+
+    bulk(works)
 
 def report_parser():
     def get_works(main_data):
@@ -507,9 +510,9 @@ def report_parser():
 
         return result
 
-    def create(data: WorkCreate) -> None:
+    def bulk(data_list: list) -> None:
         session = Session()
-        session.add(tables.Work(**data.dict()))
+        session.bulk_save_objects(data_list)
         session.commit()
         session.close()
 
@@ -520,11 +523,14 @@ def report_parser():
 
     statment_data = read_excel_statment(excel_path)
 
+    reports = []
+
     for work in tqdm(get_works(statment_data)):
         try:
-            create(data=work)
+            reports.append(tables.Work(**work.dict()))
         except:
             pass
+    bulk(reports)
 
 def parser(deelay=None):
 
