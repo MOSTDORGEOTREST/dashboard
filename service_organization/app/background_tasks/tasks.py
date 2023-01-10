@@ -490,7 +490,8 @@ def report_parser():
             # and next sheet
             if _current_year > _start_year:
                 _start_year += 1
-                _sheet_ind = _sheet_names.index(str(_start_year))
+                ind = 2022 if _start_year == 2023 else _start_year
+                _sheet_ind = _sheet_names.index(str(ind))
                 book.set_sheet_by_index(_sheet_ind)
             else:
                 break
@@ -585,7 +586,7 @@ def parser(deelay=None):
 if __name__ == "__main__":
     from settings import settings
     #parser(settings.prize_directory, settings.statment_excel_path)
-    #report_parser()
+    report_parser()
     #staff_parser()
-    courses_parser()
+    #courses_parser()
     #prize_parser(settings.prize_directory)
