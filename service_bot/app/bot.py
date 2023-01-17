@@ -235,6 +235,9 @@ async def echo(message: types.Message):
         else:
             await message.answer("Не найдено")
 
+    elif message.text.upper() == "НЕТ" and massage.from_user.id == configs.MDGT_CHAT_ID:
+        await message.reply("Пидора ответ")
+
 
 async def scheduler():
 
@@ -245,9 +248,12 @@ async def scheduler():
         try:
             prize = prize.get('value', 0)
             if prize != saved_prize:
-                saved_prize = prize
-                save_json_prize(prize)
-                await bot.send_message(configs.MDGT_CHANNEL_ID, text=Massages.prize_massage(prize))
+                if prize == 0 and today.day != 1:
+                    pass
+                else:
+                    saved_prize = prize
+                    save_json_prize(prize)
+                    await bot.send_message(configs.MDGT_CHANNEL_ID, text=Massages.prize_massage(prize))
         except TypeError:
             pass
 
@@ -263,7 +269,7 @@ async def scheduler():
         except TypeError:
             pass
 
-    aioschedule.every(60).minutes.do(check_prize)
+    aioschedule.every(20).minutes.do(check_prize)
     aioschedule.every().day.at("9:30").do(check_birthday)
 
     while True:
