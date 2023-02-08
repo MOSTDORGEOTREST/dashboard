@@ -243,7 +243,7 @@ async def echo(message: types.Message):
         await message.reply("Пидора ответ")
 
     elif "chatGPT" in message.text:
-        text = message.text
+        text = message.text.replace("chatGPT", "")
 
         lang = detect(text)
 
