@@ -244,18 +244,21 @@ async def scheduler():
     async def check_prize():
         global saved_prize
         today = date.today()
-        prize = await get_respones(f'{configs.SERVER_URI}/prizes/{today.year}-{today.month}-25')
-        try:
-            prize = prize.get('value', 0)
-            if prize != saved_prize:
-                if prize == 0 and today.day != 1:
-                    pass
-                else:
-                    saved_prize = prize
-                    save_json_prize(prize)
-                    await bot.send_message(configs.MDGT_CHANNEL_ID, text=Massages.prize_massage(prize))
-        except TypeError:
-            pass
+        now = datetime.datetime.now
+        if 10 < now.hour < 21:
+            prize = await get_respones(f'{configs.SERVER_URI}/prizes/{today.year}-{today.month}-25')
+            try:
+                prize = prize.get('value', 0)
+                if prize != saved_prize:
+                    if prize == 0 and today.day != 1:
+                        pass
+                    else:
+                        saved_prize = prize
+                        save_json_prize(prize)
+                        await bot.send_message(configs.MDGT_CHANNEL_ID, text=Massages.prize_massage(prize))
+            except TypeError:
+                pass
+        
 
     async def check_birthday():
         today = date.today()
