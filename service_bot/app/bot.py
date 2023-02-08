@@ -238,6 +238,11 @@ async def echo(message: types.Message):
     elif message.text.upper() == "НЕТ" and massage.from_user.id == configs.MDGT_CHAT_ID:
         await message.reply("Пидора ответ")
 
+    elif "chatGPT " in massage.text:
+        text = "%22" + massage.text.replace("chatGPT ", "")
+        answer = await get_respones(f'{configs.SERVER_CHATGPT_URI}/?text={text.replace(" ", "%20")}')
+        await message.reply(str(answer))
+
 
 async def scheduler():
 
@@ -258,7 +263,7 @@ async def scheduler():
                         await bot.send_message(configs.MDGT_CHANNEL_ID, text=Massages.prize_massage(prize))
             except TypeError:
                 pass
-        
+
 
     async def check_birthday():
         today = date.today()

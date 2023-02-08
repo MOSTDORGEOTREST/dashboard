@@ -9,5 +9,6 @@ class Config:
     MDGT_CHANNEL_ID = os.getenv('MDGT_CHANNEL_ID')
     SERVER_URI = os.getenv('SERVER_URI')
     SERVER_CUSTOMER_URI = os.getenv('SERVER_CUSTOMER_URI')
+    SERVER_CHATGPT_URI = os.getenv('SERVER_CHATGPT_URI')
 
 configs = Config()

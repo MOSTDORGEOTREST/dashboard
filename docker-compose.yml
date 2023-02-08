@@ -34,6 +34,12 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
 
+  service_openAI:
+    build: ./service_openAI/
+    container_name: service_openAI
+    ports:
+      - 8600:8600
+
   web:
     build: ./service_front/
     container_name: web
