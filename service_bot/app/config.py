@@ -5,6 +5,7 @@ load_dotenv(dotenv_path=os.path.normpath(".env"))
 
 class Config:
     API_TOKEN = os.getenv('API_TOKEN')
+    OPENAI_TOKEN = os.getenv('OPENAI_TOKEN')
     MDGT_CHAT_ID = os.getenv('MDGT_CHAT_ID')
     MDGT_CHANNEL_ID = os.getenv('MDGT_CHANNEL_ID')
     SERVER_URI = os.getenv('SERVER_URI')
