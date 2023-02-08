@@ -7,9 +7,6 @@ from datetime import date
 import asyncio
 import aioschedule
 import emoji
-import openai
-import translators.server as tss
-from langdetect import detect
 
 from functions import save_json_prize, read_json_prize, get_respones, get_respones_with_auth, \
     download_content_as_bytes, str_pay, get_auth
@@ -19,7 +16,6 @@ from utils import States
 
 
 bot = Bot(token=configs.API_TOKEN)
-openai.api_key = configs.OPENAI_TOKEN
 dp = Dispatcher(bot, storage=MemoryStorage())
 dp.middleware.setup(LoggingMiddleware())
 
@@ -241,32 +237,6 @@ async def echo(message: types.Message):
 
     elif message.text.upper() == "НЕТ" and massage.from_user.id == configs.MDGT_CHAT_ID:
         await message.reply("Пидора ответ")
-
-    elif "chatGPT" in message.text:
-        text = message.text.replace("chatGPT", "")
-
-        lang = detect(text)
-
-        if lang != "en":
-            text = tss.google(text, 'ru', 'en')
-
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=text,
-            temperature=0.9,
-            max_tokens=150,
-            top_p=1,
-            frequency_penalty=0.0,
-            presence_penalty=0.6,
-            stop=[" Human:", " AI:"]
-        )
-
-        if lang != "en":
-            answer = tss.google(response["choices"][0]["text"].replace("\n", ""), 'en', 'ru')
-        else:
-            answer = response["choices"][0]["text"].replace("\n", "")
-
-        await message.reply(answer)
 
 
 async def scheduler():
