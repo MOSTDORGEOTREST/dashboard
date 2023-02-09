@@ -24,7 +24,16 @@ app = FastAPI(
 
 origins = [
     "http://localhost:3000",
-    "http://localhost:8080"]
+    "http://localhost:8080",
+    "http://localhost:8000",
+    "http://192.168.0.200",
+    "http://192.168.0.200:80"
+    "http://192.168.0.200:3000"
+    "http://192.168.0.41:3000",
+    "http://192.168.0.41",
+    "http://localhost"]
+
+origins += get_self_public_ip()
 
 origins += create_ip_ports_array(get_self_public_ip(), 3000, 8000, 80)
 
@@ -32,8 +41,11 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"])
+    allow_methods=["GET", "POST", "HEAD", "OPTIONS", "DELETE", "PUT"],
+    allow_headers=["Access-Control-Allow-Headers",
+                   'Content-Type',
+                   'Authorization',
+                   'Access-Control-Allow-Origin'])
 
 
 @app.get("/")
