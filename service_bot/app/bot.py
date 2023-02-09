@@ -274,7 +274,7 @@ async def scheduler():
                     return
                 await bot.send_message(configs.MDGT_CHANNEL_ID,
                                       text=Massages.happy_birthday_massage(staff["full_name"], staff["phone_number"]))
-        except TypeError:
+        except (TypeError, AttributeError):
             pass
 
     aioschedule.every(20).minutes.do(check_prize)
