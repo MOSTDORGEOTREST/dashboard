@@ -261,7 +261,7 @@ async def scheduler():
                         saved_prize = prize
                         save_json_prize(prize)
                         await bot.send_message(configs.MDGT_CHANNEL_ID, text=Massages.prize_massage(prize))
-            except TypeError:
+            except (TypeError, AttributeError):
                 pass
 
 
