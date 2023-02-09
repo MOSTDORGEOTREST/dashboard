@@ -249,7 +249,7 @@ async def scheduler():
     async def check_prize():
         global saved_prize
         today = date.today()
-        now = datetime.datetime.now
+        now = datetime.datetime.now()
         if 10 < now.hour < 21:
             prize = await get_respones(f'{configs.SERVER_URI}/prizes/{today.year}-{today.month}-25')
             try:
