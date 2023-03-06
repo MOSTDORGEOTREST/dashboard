@@ -17,6 +17,7 @@ import db.tables as tables
 from db.tables import Base
 from db.database import engine
 from settings import settings
+from background_tasks.functions import get_staff
 
 def staff_parser():
     try:
@@ -245,22 +246,8 @@ def courses_parser():
 
 def report_parser():
     def get_works(main_data):
-        user_dict = {
-            'Баранов С.С.': 18,
-            'Денисова Л.Г.': 11,
-            'Жмылёв Д.А.': 8,
-            'Михайлов А.И.': 9,
-            'Михайлова Е.В.': 37,
-            'Михалева О.В.': 22,
-            'Селиванова О.С.': 34,
-            'Семенова О.В.': 15,
-            'Сергиенко В.В.': 33,
-            'Тишин Н.Р.': 2,
-            'Чалая Т.А.': 17,
-            'Шарунова А.А.': 20,
-            'Орлов М.С.': 38,
-            'Савенков Д.В.': 39,
-        }
+
+        user_dict = get_staff()
 
         work_dict = {
             'mathcad_report': 6,

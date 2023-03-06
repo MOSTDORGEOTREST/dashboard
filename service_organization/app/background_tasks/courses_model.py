@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from openpyxl import load_workbook
+from background_tasks.functions import get_staff
 
 @dataclass
 class UnitCourses:
@@ -58,19 +59,7 @@ class XlsBookCourses:
             'N': 'calculation'
         }
 
-        user_param = {
-            'Палашина М.Д.': 13,
-            'Смирнов Д.А.': 5,
-            'Сергиенко В.В.': 33,
-            'Тишин Н.Р.': 2,
-            'Денисова Л.Г.': 11,
-            'Жмылев Д.А.': 8,
-            'Селиванова О.С.': 34,
-            'Михайлова Е.В.': 37,
-            'Шарунова А.А.': 20,
-            'Горшков Е.С.': 6,
-            'Доронин С.А.': 36,
-        }
+        user_param = get_staff()
 
         for row in range(2, 500):
             user = self.cell_value('F', row)
