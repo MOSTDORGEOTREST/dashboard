@@ -275,41 +275,13 @@ def report_parser():
 
                 for report in reoports:
                     work_name, count = report
-
                     yield WorkCreate(
-                        user_id=user_dict[unit.engineer.strip()],
+                        user_id=user_dict[unit.engineer.strip().replace("ё", "е")],
                         date=date,
                         object_number=unit.object_number,
                         work_id=work_dict[work_name],
                         count=count
                     )
-
-                    '''if datetime:
-                        from_db = _get(
-                            user_id=user_dict[unit.engineer.strip()],
-                            date=date,
-                            object_number=unit.object_number,
-                            work_id=work_dict[work_name],
-                            count=count
-                        )
-                        if not from_db:
-                            yield WorkCreate(
-                                user_id=user_dict[unit.engineer.strip()],
-                                date=date,
-                                object_number=unit.object_number,
-                                work_id=work_dict[work_name],
-                                count=count
-                            )
-                        else:
-                            continue
-                    else:
-                        yield WorkCreate(
-                            user_id=user_dict[unit.engineer.strip()],
-                            date=date,
-                            object_number=unit.object_number,
-                            work_id=work_dict[work_name],
-                            count=count
-                        )'''
 
     def _get(
             user_id: int,

@@ -9,3 +9,4 @@ app_customers/.env
 bot/prize.json
 app/db/database.sqlite3
 .DS_Store
+.DS_Store
