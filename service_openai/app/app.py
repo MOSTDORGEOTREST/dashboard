@@ -5,7 +5,7 @@ import translators.server as tss
 from langdetect import detect
 import http.client
 
-openai.api_key = "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"
+openai.api_key = ""
 
 def get_self_public_ip():
     conn = http.client.HTTPConnection("ifconfig.me")
