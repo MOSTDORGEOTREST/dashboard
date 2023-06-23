@@ -1,7 +1,7 @@
 from pydantic import BaseSettings
 import os
 
-conf = ['server', 'linux', 'mac']
+conf = ['server', 'linux', 'mac', 'win']
 
 config = conf[0]
 
