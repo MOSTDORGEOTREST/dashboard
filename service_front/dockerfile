@@ -3,19 +3,21 @@ FROM nginx
 WORKDIR /usr/share/react
 
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
-RUN apt-get install -y nodejs
+RUN apt-get update && apt-get install -y nodejs
+
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+RUN apt-get update && apt-get install -y yarn
 
 COPY package*.json ./
 
-RUN npm install
+RUN yarn install --legacy-peer-deps
 
 COPY . .
 
-RUN npm run build
+RUN export NODE_OPTIONS=--openssl-legacy-provider && yarn run build
 
 COPY nginx.conf /etc/nginx/nginx.conf
 
 RUN rm -r /usr/share/nginx/html/*
-
 RUN cp -a build/. /usr/share/nginx/html
-
