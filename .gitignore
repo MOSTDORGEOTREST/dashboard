@@ -8,5 +8,3 @@ app_customers/.env
 **/.DS_Store
 bot/prize.json
 app/db/database.sqlite3
-.DS_Store
-.DS_Store

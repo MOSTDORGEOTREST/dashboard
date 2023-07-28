@@ -29,8 +29,8 @@ class Settings(BaseSettings):
     prize_directory: str = os.path.normcase(prize_dir)
     courses_directory: str = os.path.normcase(courses_dir)
 
-    excel_staff: str = f'{db_path}staff.xlsx'
-    excel_work_types: str = f'{db_path}work_types.xlsx'
+    excel_staff: str = '/files/Обмен/Никите Романовичу/!Программы/dash/Dashboard/staff.xlsx'
+    excel_work_types: str = '/files/Обмен/Никите Романовичу/!Программы/dash/Dashboard/work_types.xlsx'
     database_url: str = f"sqlite:///{db_path}database.sqlite3"
 
     jwt_secret: str = "OOIOIPSJFBSFBSBGBBSB"
