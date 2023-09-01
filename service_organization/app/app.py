@@ -18,24 +18,38 @@ def create_ip_ports_array(ip: str, *ports):
     return array
 
 app = FastAPI(
-    title="Georeport MDGT",
-    description="Сервис аутентификации протоколов испытаний",
-    version="2.3.0")
+    title="DashBoard MDGT",
+    description="Отображение показателей работы компании",
+    version="2.0.0",
+    allow_methods=["GET", "POST", "HEAD", "OPTIONS"],
+    allow_headers=["Access-Control-Allow-Headers", 'Content-Type', 'Authorization', 'Access-Control-Allow-Origin']
+)
 
 origins = [
     "http://localhost:3000",
     "http://localhost:8080",
-    "http://localhost:9573"]
+    "http://localhost:8000",
+    "http://192.168.0.200",
+    "http://192.168.0.200:80",
+    "http://192.168.0.200:3000",
+    "http://192.168.0.41:3000",
+    "http://192.168.0.41",
+    "http://localhost"
+]
 
 origins += create_ip_ports_array(configs.host_ip, 3000, 8000, 80, 9573)
+origins += get_self_public_ip()
+origins += create_ip_ports_array(get_self_public_ip(), 3000, 8000, 80)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS", "DELETE", "PATCH", "PUT"],
-    allow_headers=["Content-Type", "Set-Cookie", "Access-Control-Allow-Headers", "Access-Control-Allow-Origin",
-                   "Authorization", "Accept", "X-Requested-With"],
+    allow_methods=["GET", "POST", "HEAD", "OPTIONS", "DELETE", "PUT"],
+    allow_headers=["Access-Control-Allow-Headers",
+                   'Content-Type',
+                   'Authorization',
+                   'Access-Control-Allow-Origin']
 )
 
 app.include_router(router)
