@@ -37,7 +37,6 @@ origins = [
     "http://localhost"
 ]
 
-origins += create_ip_ports_array(configs.host_ip, 3000, 8000, 80, 9573)
 origins += get_self_public_ip()
 origins += create_ip_ports_array(get_self_public_ip(), 3000, 8000, 80)
 
