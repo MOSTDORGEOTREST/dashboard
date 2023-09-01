@@ -3,40 +3,42 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
-class Staff(Base):
-    __tablename__ = 'Staff'
+import enum
+class staff(Base):
+    __tablename__ = 'staff'
 
-    id = Column(Integer, primary_key=True)
-    full_name = Column(String)
+    employee_id = Column(Integer, primary_key=True, autoincrement=True)
+    first_name = Column(String)
+    middle_name = Column(String)
+    last_name = Column(String)
     password_hash = Column(String)
     phone_number = Column(BigInteger, nullable=True)
     birthday = Column(Date)
     is_superuser = Column(Boolean)
     rate = Column(Integer)
     developer_percent = Column(Float)
-    calculation_percent = Column(Float)
 
-class Work(Base):
-    __tablename__ = 'Work'
+class works(Base):
+    __tablename__ = 'works'
 
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('Staff.id'))
+    work_id = Column(Integer, primary_key=True, autoincrement=True)
+    employee_id = Column(Integer, ForeignKey('staff.employee_id'))
     date = Column(Date)
     object_number = Column(String)
-    work_id = Column(Integer, ForeignKey('WorkType.id'))
+    worktype_id = Column(Integer, ForeignKey('worktypes.worktype_id'))
     count = Column(Float)
 
-class WorkType(Base):
-    __tablename__ = 'WorkType'
+class worktypes(Base):
+    __tablename__ = 'worktypes'
 
-    id = Column(Integer, primary_key=True)
-    category = Column(String)
+    worktype_id = Column(Integer, primary_key=True, autoincrement=True)
+    category_name = Column(String)
     work_name = Column(String)
     price = Column(Float)
     dev_tips = Column(Float)
 
-class Prize(Base):
-    __tablename__ = 'Prize'
+class prizes(Base):
+    __tablename__ = 'prizes'
 
     date = Column(Date, primary_key=True)
     value = Column(Float)

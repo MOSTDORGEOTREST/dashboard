@@ -1,54 +1,76 @@
 from typing import List, Optional
 from datetime import date
-from fastapi import Depends, HTTPException, status
+from fastapi import HTTPException, status
+from sqlalchemy.future import select
+from sqlalchemy import update, delete
 from sqlalchemy.orm import Session
-from models.prize import Prize
+from sqlalchemy.dialects.postgresql import insert
 
+from models.prize import Prize
 import db.tables as tables
-from db.database import get_session
 
 class PrizesService:
-    def __init__(self, session: Session = Depends(get_session)):
+    def __init__(self, session: Session):
         self.session = session
 
-    def _get(self, date: date) -> Optional[tables.Prize]:
-        prize = self.session.query(tables.Prize).filter_by(date=date).first()
+    async def _get(self, date: date) -> Optional[tables.prizes]:
+        prize = await self.session.execute(
+            select(tables.prizes).
+            filter_by(date=date)
+        )
+        prize = prize.scalars().first()
         if not prize:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         return prize
 
-    def get_all(self) -> List[tables.Prize]:
-        prizes = self.session.query(tables.Prize).order_by(tables.Prize.date).all()
+    async def get_all(self) -> List[tables.prizes]:
+        prizes = await self.session.execute(
+            select(tables.prizes)
+        )
+        prizes = prizes.scalars().all()
         return prizes
 
-    def get(self, date: date) -> tables.Prize:
+    async def get(self, date: date) -> tables.prizes:
+        return await self._get(date)
+
+    async def create(self, prize_data: Prize) -> tables.prizes:
+        stmt = insert(tables.prizes).values(
+            **prize_data.dict())
+
+        stmt = stmt.on_conflict_do_update(
+            index_elements=['date'],
+            set_=stmt.excluded
+        )
+        await self.session.execute(stmt)
+        await self.session.commit()
+
+        return tables.prizes(**prize_data.dict())
+
+    async def update(self, date: date, prize_data: Prize) -> tables.prizes:
         prize = self._get(date)
-        return prize
+        prize = prize.scalars().first()
 
-    def create(self, prize_data: Prize) -> tables.Prize:
-        prize = tables.Prize(**prize_data.dict())
-        try:
-            self._get(prize_data.date)
-        except HTTPException:
-            self.session.add(prize)
-            self.session.commit()
-            return prize
-        else:
-            return self.update(prize.date, prize_data)
+        if not prize:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-    def update(self, date: date, prize_data: Prize) -> tables.Prize:
-        prize = self._get(date)
-        for field, value in prize_data:
-            setattr(prize, field, value)
-        self.session.commit()
-        return prize
+        q = update(tables.prizes).where(tables.prizes.date == date).values(
+            value=prize_data.value
+        )
+        q.execution_options(synchronize_session="fetch")
+        await self.session.execute(q)
+        await self.session.commit()
+        return Prize(
+            **prize_data.dict()
+        )
 
-    def delete(self, date: date):
-        prize = self._get(date)
-        self.session.delete(prize)
-        self.session.commit()
+    async def delete(self, date: date):
+        q = delete(tables.prizes).where(tables.prizes.date == date)
+        q.execution_options(synchronize_session="fetch")
 
-    def create_many(self, prizes_data: List[Prize]) -> List[tables.Prize]:
+        await self.session.execute(q)
+        await self.session.commit()
+
+    def create_many(self, prizes_data: List[Prize]) -> List[tables.prizes]:
         prizes = [tables.Report(**prize_data.dict()) for prize_data in prizes_data]
         self.session.add_all(prizes)
         self.session.commit()

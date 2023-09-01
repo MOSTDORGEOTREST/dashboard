@@ -14,4 +14,4 @@ COPY ./app /code
 
 COPY ./.env /code/.env
 
-CMD ["python", "bot.py"]
+CMD ["python", "main.py"]

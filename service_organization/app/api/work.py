@@ -1,12 +1,12 @@
 import datetime
 from fastapi.responses import JSONResponse
-from fastapi import APIRouter, Depends, Response, status, HTTPException, Query
+from fastapi import APIRouter, Depends, status, HTTPException, Query
 from typing import List, Optional
-from datetime import date
 
 from models.work import Work, WorkCreate, WorkUpdate, WorkType, WorkPrint, Report
 from services.work import WorkService
-from services.staff import get_current_user, User, StaffService
+from services.staff import get_current_user, User, UsersService
+from services.depends import get_works_service, get_users_service
 
 router = APIRouter(
     prefix="/works",
@@ -14,19 +14,19 @@ router = APIRouter(
 
 
 @router.get("/", response_model=List[WorkPrint])
-def get_work(
+async def get_work(
         month: int = Query(qt=1, le=12),
         year: int = Query(qt=2017, le=2030),
         user_id: Optional[int] = Query(None),
-        service: WorkService = Depends(),
+        service: WorkService = Depends(get_works_service),
         current_user: User = Depends(get_current_user)
 ):
     """Запрос работ за текущий месяц"""
     if user_id is None:
-        user_id = current_user.id
+        user_id = current_user.employee_id
 
-    if user_id == current_user.id or current_user.is_superuser:
-        return service.get_month_work(month=month, year=year, user_id=user_id)
+    if user_id == current_user.employee_id or current_user.is_superuser:
+        return await service.get_month_work(month=month, year=year, user_id=user_id)
     else:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -35,14 +35,14 @@ def get_work(
 
 
 @router.post("/", response_model=WorkCreate)
-def create_work(
+async def create_work(
         data: WorkCreate,
-        service: WorkService = Depends(),
+        service: WorkService = Depends(get_works_service),
         current_user: User = Depends(get_current_user)
 ):
     """Создание записи в базе работ"""
-    if data.user_id == current_user.id or current_user.is_superuser:
-        return service.create(data=data)
+    if data.employee_id == current_user.employee_id or current_user.is_superuser:
+        return await service.create(data=data)
     else:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -51,15 +51,15 @@ def create_work(
 
 
 @router.put('/', response_model=Work)
-def update_work(
+async def update_work(
         id: int,
         data: WorkUpdate,
-        service: WorkService = Depends(),
+        service: WorkService = Depends(get_works_service),
         current_user: User = Depends(get_current_user)
 ):
     """Обновление записи в базе работ"""
-    if data.user_id == current_user.id or current_user.is_superuser:
-        return service.update(id=id, data=data)
+    if data.employee_id == current_user.employee_id or current_user.is_superuser:
+        return await service.update(id=id, data=data)
     else:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -68,15 +68,15 @@ def update_work(
 
 
 @router.delete('/', status_code=status.HTTP_200_OK)
-def delete_work(
+async def delete_work(
         id: int,
-        service: WorkService = Depends(),
+        service: WorkService = Depends(get_works_service),
         current_user: User = Depends(get_current_user)
 ):
     """Удаление записи в базе работ"""
-    work = service.get(id)
-    if work.user_id == current_user.id or current_user.is_superuser:
-        service.delete(id=id)
+    work = await service.get(id)
+    if work.employee_id == current_user.employee_id or current_user.is_superuser:
+        await service.delete(id=id)
         content = {"message": "8====)"}
         response = JSONResponse(content=content, status_code=status.HTTP_200_OK)
         return response
@@ -88,28 +88,28 @@ def delete_work(
 
 
 @router.get("/pay/{user_id}")
-def get_month_user_pay(
+async def get_month_user_pay(
         month: Optional[int] = Query(None, qt=1, le=12),
         year: Optional[int] = Query(None, qt=2017, le=2030),
         user_id: Optional[int] = Query(None),
-        service: WorkService = Depends(),
-        user_service: StaffService = Depends(),
+        service: WorkService = Depends(get_works_service),
+        user_service: UsersService = Depends(get_users_service),
         current_user: User = Depends(get_current_user)
 ):
     """Расчет выплат сотрудника за месяц"""
     if user_id is None:
-        user_id = current_user.id
+        user_id = current_user.employee_id
 
     if not month or not year:
         today = datetime.date.today()
         month = today.month
         year = today.year
 
-    if user_id == current_user.id:
-        return service.get_month_user_pay(user=current_user, month=month, year=year)
+    if user_id == current_user.employee_id:
+        return await service.get_month_user_pay(user=current_user, month=month, year=year)
     elif current_user.is_superuser:
-        user = user_service._get(id=user_id)
-        return service.get_month_user_pay(user=user, month=month, year=year)
+        user = await user_service._get(id=user_id)
+        return await service.get_month_user_pay(user=user, month=month, year=year)
     else:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -118,63 +118,50 @@ def get_month_user_pay(
 
 
 @router.get("/work-types", response_model=List[WorkType])
-def get_work_types(
-        service: WorkService = Depends()):
+async def get_work_types(
+        service: WorkService = Depends(get_works_service)):
     """Список работ с ценами"""
-    return service.get_work_types()
+    return await service.get_work_types()
 
 
 @router.get("/reports", response_model=List[Report])
-def get_reports(
+async def get_reports(
         month_period: Optional[int] = Query(default=6),
-        service: WorkService = Depends()
+        service: WorkService = Depends(get_works_service)
 ):
     """Запрос отчетов за все месяцы из базы"""
-    return service.get_reports(month_period=month_period)
+    return await service.get_reports(month_period=month_period)
 
 
 @router.get("/report", response_model=Report)
-def get_report(
+async def get_report(
         month: Optional[int] = Query(default=None, qt=1, le=12),
         year: Optional[int] = Query(default=None, qt=2017, le=2030),
-        service: WorkService = Depends()
+        service: WorkService = Depends(get_works_service)
 ):
     """Запрос отчета за конкретный месяц"""
     if not month or not year:
         current_date = datetime.date.today()
         month = current_date.month
         year = current_date.year
-    return service.get_month_reports(month=month, year=year)
+    return await service.get_month_reports(month=month, year=year)
 
 
 @router.get("/pays")
-def get_pays(
+async def get_pays(
         month_period: Optional[int] = Query(6),
-        service: WorkService = Depends()
+        service: WorkService = Depends(get_works_service),
+        current_user: User = Depends(get_current_user)
 ):
     """Запрос отчетов за все месяцы из базы"""
-    return service.get_pays(month_period=month_period)
-
-
-@router.get("/pay")
-def get_pay(
-        month: Optional[int] = Query(default=None, qt=1, le=12),
-        year: Optional[int] = Query(default=None, qt=2017, le=2030),
-        service: WorkService = Depends()
-):
-    """Запрос отчета за конкретный месяц"""
-    if not month or not year:
-        current_date = datetime.date.today()
-        month = current_date.month
-        year = current_date.year
-    return service.get_month_pay(month=month, year=year)
+    return await service.get_pays(month_period=month_period, user=current_user)
 
 
 @router.put('/check_exsistance')
-def check_exsistance(
+async def check_exsistance(
         data: WorkUpdate,
-        service: WorkService = Depends()
+        service: WorkService = Depends(get_works_service)
 ):
     """Проверка существования работы"""
-    return service.check_exsistance(data=data)
+    return await service.check_exsistance(data=data)
 

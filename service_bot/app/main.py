@@ -8,20 +8,18 @@ import asyncio
 import aioschedule
 import emoji
 
-from functions import save_json_prize, read_json_prize, get_respones, get_respones_with_auth, \
+from modules.functions import save_json_prize, read_json_prize, get_respones, get_respones_with_auth, \
     download_content_as_bytes, str_pay, get_auth
 from config import configs
-from massages import Massages
-from utils import States
+from modules.massages import Massages
+from modules.utils import States
 
 
 bot = Bot(token=configs.API_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
 dp.middleware.setup(LoggingMiddleware())
 
-
 saved_prize = read_json_prize()
-
 
 users_logins = {}
 
@@ -184,7 +182,7 @@ async def birthdays(message: types.Message):
     try:
         s = ""
         for staff in staffs:
-            s += f"{staff['birthday']} | {staff['full_name']}" + "\n\n"
+            s += f"{staff['birthday']} | {staff['last_name']} {staff['first_name']} {staff['middle_name']}" + "\n\n"
         await message.answer(s if s else "Не найдено")
     except:
         await message.answer("Не найдено")
@@ -207,7 +205,7 @@ async def echo(message: types.Message):
             return
 
         try:
-            s = "".join([f"{staff['full_name']} | {staff['phone_number']}\n" for staff in staffs])
+            s = "".join([f"{staff['last_name']} {staff['first_name']} {staff['middle_name']} | {staff['phone_number']}\n" for staff in staffs])
             await message.answer(s if s else "Не найдено")
         except:
             await message.answer("Не найдено")
@@ -259,7 +257,6 @@ async def scheduler():
             except (TypeError, AttributeError):
                 pass
 
-
     async def check_birthday():
         today = date.today()
         staffs = await get_respones(f'{configs.SERVER_URI}/staff/day_birthday/?month={today.month}&day={today.day}')
@@ -268,7 +265,7 @@ async def scheduler():
                 if staff == "detail":
                     return
                 await bot.send_message(configs.MDGT_CHANNEL_ID,
-                                      text=Massages.happy_birthday_massage(staff["full_name"], staff["phone_number"]))
+                                      text=Massages.happy_birthday_massage(f"{staff['last_name']} {staff['first_name']} {staff['middle_name']}", staff["phone_number"]))
         except (TypeError, AttributeError):
             pass
 

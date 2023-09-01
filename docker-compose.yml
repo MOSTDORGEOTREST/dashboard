@@ -4,51 +4,23 @@ services:
   service_organization:
     build: ./service_organization/
     container_name: service_organization
+    command: bash -c 'uvicorn main:app --host 0.0.0.0'
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
+      - JWT_EXPIRATION=${JWT_EXPIRATION}
     ports:
       - 8000:8000
     restart: always
     volumes:
-      - /home/user_bot/disk-z:/files
-      - /home/user_bot/databases/:/databases
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
 
-  service_customers:
-    build: ./service_customers/
-    container_name: service_customers
-    ports:
-      - 9000:9000
-    volumes:
-      - /home/user_bot/databases/:/databases
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-
-  service_control:
-    build: ./service_control/
-    container_name: service_control
-    ports:
-      - 8500:8500
-    volumes:
-      - /home/user_bot/disk-z:/files
-      - /home/user_bot/databases/:/databases
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-
-  web:
+  service_front:
     build: ./service_front/
     container_name: web
     ports:
       - 80:80
     restart: always
 
-  service_bot:
-    build: ./service_bot
-    container_name: service_bot
-    restart: always
-    network_mode: host
-    volumes:
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-
-volumes:
-  databases:

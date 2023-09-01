@@ -1,10 +1,5 @@
-venv
-.env
-bot/.env
-app/.env
-app_customers/.env
 **/.idea
 **/__pycache__
 **/.DS_Store
-bot/prize.json
-app/db/database.sqlite3
+**/venv
+**/.env

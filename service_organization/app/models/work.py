@@ -3,17 +3,17 @@ from datetime import date
 from enum import Enum
 
 class WorkBase(BaseModel):
-    user_id: int
+    employee_id: int
     date: date
     object_number: str
-    work_id: int
     count: float
+    worktype_id: int
 
     class Config:
         orm_mode = True
 
 class Work(WorkBase):
-    id: int
+    work_id: int
 
 class WorkCreate(WorkBase):
     pass
@@ -22,7 +22,7 @@ class WorkUpdate(WorkBase):
     pass
 
 class WorkPrint(BaseModel):
-    id: int
+    worktype_id: int
     date: date
     object_number: str
     work_name: str
@@ -36,9 +36,9 @@ class WorkCategory(str, Enum):
     CALCULATIONS = "Расчеты"
 
 class WorkType(BaseModel):
-    id: int
+    worktype_id: int
     work_name: str
-    category: WorkCategory
+    category_name: WorkCategory
     price: float
     dev_tips: float
 

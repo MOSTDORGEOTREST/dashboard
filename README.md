@@ -7,37 +7,13 @@
 * service_organization - Сервис собирает и обновляет данные по премии, отчетам и сотрудникам.
 * service_customer - Сервис собирает и обновляет данные по заказчикам.
 
-#### [Схема БД](https://dbdiagram.io/d/6319d6cc0911f91ba563ae05)
+#### [Схема БД](https://dbdiagram.io/d/64ca18aa02bd1c4a5e1ab27a)
 
-Работает с сетевым диском компании. Для работы надо подключить диск к папке.
+Работает обновление БД через сетевой диск компании!
 
 ## Запуск:
 1. Создать папку для проекта. Открыть папку в терминале и выполнить:\
-    `git init git clone https://github.com/tnick1502/mdgt_dashboard.git`
+    `git init git clone https://github.com/MOSTDORGEOTREST/dashbord.git`
 
-2. Подключение диска:\
-    Для Linux привяжем сетевой диск к папке:\
-    `sudo mount.cifs ip_диска/files YOUR_PATH -o user=пользователь,pass=пароль`
-    
-    YOUR_PATH выбираем сами. Пример:\
-    `/home/nick/projects/reports`
-
-    Для Windows ничего не делаем. Далее испозьзуем `YOUR_PATH = ip_диска/files`
-
-3. Создать структуру папок:\
-   -/home/databases/\
-   ---customers\
-   ------customers.xlsx   
-   ------photos\
-   ---------1/pick1.jpg....\
-   ---------2/pick1.jpg....\
-   ---organization\
-   ------staff.xlsx
-   ------work_types.xlsx
-    
-    В папке photos хранятся фото заказчиков c именами по id в формате jpg.
-    
-    Файлы staff.xlsx и customers.xlsx хранятся в папке data.
-
-5. Запуск через docker-compose\
+2. Запуск через docker-compose\
     `docker-compose up`
