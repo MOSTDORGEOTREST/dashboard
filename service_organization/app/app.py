@@ -10,12 +10,18 @@ from db import tables
 from passlib.hash import bcrypt
 from sqlalchemy.future import select
 from sqlalchemy import update, delete
+import http
 
 def create_ip_ports_array(ip: str, *ports):
     array = []
     for port in ports:
         array.append(f"{ip}:{str(port)}")
     return array
+
+def get_self_public_ip():
+    conn = http.client.HTTPConnection("ifconfig.me")
+    conn.request("GET", "/ip")
+    return conn.getresponse().read().decode()
 
 app = FastAPI(
     title="DashBoard MDGT",
@@ -55,6 +61,7 @@ app.include_router(router)
 
 @app.get("/", response_class=HTMLResponse)
 async def index():
+    division_by_zero = 1 / 0
     return JSONResponse(content={'massage': 'successful'}, status_code=200)
 
 @app.on_event("startup")
