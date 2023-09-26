@@ -33,6 +33,7 @@ export default function Staff() {
 							data[0].birthday.split('-').length === 3
 						) {
 							data = sortBds(data)
+							console.log(data);
 							setBirthdays(data)
 							setLoaded(true)
 						}
@@ -50,6 +51,8 @@ export default function Staff() {
 	}, [isLogged])
 
 	function fromName(fullname) {
+		if (!fullname) return ''
+
 		const splitName = fullname.split(' ')
 		if (splitName.length < 3) {
 			return fullname
@@ -119,7 +122,7 @@ export default function Staff() {
 									className={`bd-card ${isToday(bd.birthday)}`}
 									key={bd.phone_number}
 								>
-									<div className="bd-card__name">{fromName(bd.full_name)}</div>
+									<div className="bd-card__name">{fromName(`${bd.last_name} ${bd.first_name} ${bd.middle_name}`)}</div>
 									<div className="bd-card__phone">
 										<svg
 											xmlns="http://www.w3.org/2000/svg"

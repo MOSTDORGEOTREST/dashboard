@@ -99,7 +99,7 @@ export default function Table({ searchData }) {
 		tableRequestor
 			.get(
 				`${api}works/?month=${_date.getMonth() +
-					1}&year=${_date.getFullYear()}&user_id=${accountData.id}`
+					1}&year=${_date.getFullYear()}&user_id=${accountData.employee_id}`
 			)
 			.then((response) => {
 				if (response.status === 200) {

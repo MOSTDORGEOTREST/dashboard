@@ -131,7 +131,7 @@ export default function WorkSubmitter({ searchData, isMobileType = false }) {
 		// console.log(accountData);
 		postNewData
 			.post(`${api}works/`, {
-				user_id: accountData.id,
+				user_id: accountData.employee_id,
 				date: inputDate,
 				object_number: inputAdditional,
 				work_id: inputID,
@@ -224,7 +224,7 @@ export default function WorkSubmitter({ searchData, isMobileType = false }) {
 
 		postNewData
 			.put(`${api}works/?id=${workID}`, {
-				user_id: accountData.id,
+				user_id: accountData.employee_id,
 				date: inputDate,
 				object_number: inputAdditional,
 				work_id: inputID,
