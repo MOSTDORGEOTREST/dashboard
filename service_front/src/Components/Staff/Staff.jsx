@@ -50,6 +50,8 @@ export default function Staff() {
 	}, [isLogged])
 
 	function fromName(fullname) {
+		if (!fullname) return ''
+
 		const splitName = fullname.split(' ')
 		if (splitName.length < 3) {
 			return fullname
