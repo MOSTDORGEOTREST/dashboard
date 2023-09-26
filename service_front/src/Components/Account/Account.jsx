@@ -166,7 +166,7 @@ export default function Account({ toSummary }) {
 							paymentsRequestor
 								.get(
 									`${api}works/pay/${
-										_accountData.id
+										_accountData.employee_id
 									}?month=${new Date().getMonth() +
 										1}&year=${new Date().getFullYear()}`
 								)
@@ -288,7 +288,7 @@ export default function Account({ toSummary }) {
 				date.setMonth(date.getMonth() + 1)
 				await paymentsRequestor
 					.get(
-						`${api}works/pay/${accountData.id}?month=${date.getMonth() +
+						`${api}works/pay/${accountData.employee_id}?month=${date.getMonth() +
 							1}&year=${date.getFullYear()}`
 					)
 					.then((response) => {
@@ -437,18 +437,18 @@ export default function Account({ toSummary }) {
 					<div className="card-item account__general">
 						<div className="account__general-item">
 							<h3 className="account__general-value">
-								{accountData.full_name.split(' ')[0]}
+								{accountData.last_name}
 							</h3>
 							<div className="account__general-sub">{`${
-								accountData.full_name.split(' ')[1]
-							} ${accountData.full_name.split(' ')[2]}`}</div>
+								accountData.first_name
+							} ${accountData.middle_name}`}</div>
 						</div>
 						<div className="account__general-item">
 							<h3 className="account__general-value">{accountData.rate}</h3>
 							<div className="account__general-sub">Ставка</div>
 						</div>
 						<div className="account__general-item">
-							<h3 className="account__general-value">{`${accountData.calculation_percent}%`}</h3>
+							<h3 className="account__general-value">{accountData.calculation_percent?`${accountData.calculation_percent}%`:'0%'}</h3>
 							<div className="account__general-sub">От расчетов</div>
 						</div>
 						<div className="account__general-item">

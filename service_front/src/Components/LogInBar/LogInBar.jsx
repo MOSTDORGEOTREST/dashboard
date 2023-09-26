@@ -97,6 +97,7 @@ export default function LogInBar() {
 		client.interceptors.response.use(
 			function(response) {
 				if (response.status === 200) {
+					console.log(response);
 					setUserName(user.value())
 					setLogged(true)
 					setErrClass('')
