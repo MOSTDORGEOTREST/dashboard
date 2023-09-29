@@ -9,8 +9,8 @@ import Context from './context'
 
 function App() {
 	const [isLogged, setLogged] = useState(false)
-	const api = useRef('http://localhost:8000/')
-	const api_customers = useRef('http://localhost:9000/')
+	const api = useRef('http://192.168.0.200:8000/')
+	const api_customers = useRef('http://192.168.0.200:9000/')
 
 	const [hidedCards, setHidedCards] = useState({})
 
