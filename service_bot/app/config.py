@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+from pydantic import Field
 import os
 
 load_dotenv(dotenv_path=os.path.normpath(".env"))
