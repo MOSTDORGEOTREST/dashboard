@@ -1,29 +1,6 @@
 version: '3.7'
 
 services:
-  service_organization:
-    build: ./service_organization/
-    container_name: service_organization
-    command: bash -c 'uvicorn main:app --host 0.0.0.0'
-    environment:
-      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_NAME}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_ALGORITHM=${JWT_ALGORITHM}
-      - JWT_EXPIRATION=${JWT_EXPIRATION}
-    ports:
-      - 8000:8000
-    restart: always
-    volumes:
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-
-  service_front:
-    build: ./service_front/
-    container_name: web
-    ports:
-      - 80:80
-    restart: always
-
   updater:
     build: ./service_updater
     command: bash -c 'python tasks.py'
@@ -31,7 +8,7 @@ services:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_NAME}
     restart: always
     volumes:
-      - /home/user_bot/disk-z/МДГТ - (Учет рабоч. времени, Отпуск, Даты рожд., телефоны, план работ):/files
+      - /home/user_bot/disk-z:/files
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
 
