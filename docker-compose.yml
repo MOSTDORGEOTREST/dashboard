@@ -38,8 +38,7 @@ services:
     ports:
       - 80:80
     restart: always
-
-
+    
   updater:
     build: ./service_updater
     command: bash -c 'python tasks.py'
