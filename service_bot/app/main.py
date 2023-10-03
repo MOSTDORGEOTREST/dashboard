@@ -51,7 +51,7 @@ async def second_state_case_met(message: types.Message):
         users_logins.pop(message.from_user.id)
         await message.answer("Неправильный логин или пароль " + emoji.emojize(":smiling_face_with_tear:"))
     else:
-        users_logins[message.from_user.id]['id'] = register["id"]
+        users_logins[message.from_user.id]['id'] = register["employee_id"]
         await message.answer(emoji.emojize("Успешная авторизация\nДля доступа к выплатам используйте команду /pay"))
 
     state = dp.current_state(user=message.from_user.id)
