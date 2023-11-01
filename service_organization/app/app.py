@@ -107,7 +107,8 @@ async def startup_event():
                     'Доронин': "822Nt",
                     'Михайлова': "xHbzg",
                     'Орлов': "xhUYK",
-                    'Савенков': "4nuzb"
+                    'Савенков': "4nuzb",
+                    'Гаврилович': "lj,hjtenhj842"
                 }
 
                 user_names = await session.execute(
