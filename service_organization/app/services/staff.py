@@ -156,7 +156,7 @@ class UsersService:
     async def register_new_user(self, user_data: UserCreate) -> Token:
         phones = await self.session.execute(
             select(tables.staff).
-            filter_by(phone=user_data.phone_number)
+            filter_by(phone_number=user_data.phone_number)
         )
 
         phones = phones.scalars().first()
