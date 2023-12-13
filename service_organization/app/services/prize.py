@@ -25,7 +25,8 @@ class PrizesService:
 
     async def get_all(self) -> List[tables.prizes]:
         prizes = await self.session.execute(
-            select(tables.prizes)
+            select(tables.prizes).
+            order_by(tables.prizes.date)
         )
         prizes = prizes.scalars().all()
         return prizes
