@@ -50,7 +50,7 @@ def get_staff(full=False):
                    'Хайбулина Е.М.': 22, 'Череповский А.В.': 23, 'Жидков И.М.': 24, 'Старостин П.А.': 25,
                    'Щербинина Н.В.': 26, 'Абдуллина Н.А.': 27, 'Сорокина О.В.': 28, 'Байбекова С.Р.': 29,
                    'Сергиенко В.В.': 30, 'Селиванова О.С.': 31, 'Фролова Н.А.': 32, 'Доронин С.А.': 33,
-                   'Михайлова Е.В.': 34, 'Орлов М.С.': 35, 'Савенков Д.В.': 36}
+                   'Михайлова Е.В.': 34, 'Орлов М.С.': 35, 'Савенков Д.В.': 36, 'Гаврилович А.С.': 37}
     full_staff = {'Никитин Никита Михайлович': 1, 'Тишин Никита Романович': 2, 'Шкарова Оксана Павловна': 3,
                   'Смирнов Дмитрий Александрович': 5, 'Горшков Евгений Сергеевич': 6, 'Власов Сергей Викторович': 7,
                   'Жмылев Дмитрий Александрович': 8, 'Михайлов Артем Игоревич': 9, 'Селиванов Иван Алексеевич': 10,
@@ -339,7 +339,7 @@ def report_parser():
         _start_year = 2022
         _current_year = _now.year
         _sheet_names = book.sheet_names()
-        _start_sheet_ind = _sheet_names.index(str(_start_year))
+        _start_sheet_ind = _sheet_names.index("2022-2023")
         book.set_sheet_by_index(_start_sheet_ind)
         # start parsing for each sheet
         while not book.is_empty_sheet(min_rows=START_ROW, min_cols=N_COLS):
@@ -424,13 +424,17 @@ def report_parser():
                                                     mechanics_statement=_mechanics_count))
 
             # and next sheet
-            if _current_year > _start_year:
+            _start_year += 1
+            ind = 2024
+            _sheet_ind = _sheet_names.index(str(ind))
+            book.set_sheet_by_index(_sheet_ind)
+            """if _current_year > _start_year:
                 _start_year += 1
                 ind = 2022 if _start_year == 2023 else _start_year
                 _sheet_ind = _sheet_names.index(str(ind))
                 book.set_sheet_by_index(_sheet_ind)
             else:
-                break
+                break"""
 
         # recalculate dates
         if last_date:
