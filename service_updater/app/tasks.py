@@ -342,7 +342,10 @@ def report_parser():
         _start_sheet_ind = _sheet_names.index("2022-2023")
         book.set_sheet_by_index(_start_sheet_ind)
         # start parsing for each sheet
-        while not book.is_empty_sheet(min_rows=START_ROW, min_cols=N_COLS):
+        
+        i=0
+        while not book.is_empty_sheet(min_rows=START_ROW, min_cols=N_COLS) and i <= 10000:
+            i+=1
             # count sheet sizes
             ncols = book.sheet.ncols + 1  # Natural ncols
             nrows = book.sheet.nrows + 1  # Natural nrows
@@ -424,7 +427,7 @@ def report_parser():
                                                     mechanics_statement=_mechanics_count))
 
             # and next sheet
-            _start_year += 1
+            _start_year += 2
             ind = 2024
             _sheet_ind = _sheet_names.index(str(ind))
             book.set_sheet_by_index(_sheet_ind)
