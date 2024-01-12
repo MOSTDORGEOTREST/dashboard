@@ -342,7 +342,7 @@ def report_parser():
         _start_sheet_ind = _sheet_names.index("2022-2023")
         book.set_sheet_by_index(_start_sheet_ind)
         # start parsing for each sheet
-        
+
         i=0
         while not book.is_empty_sheet(min_rows=START_ROW, min_cols=N_COLS) and i <= 10000:
             i+=1
