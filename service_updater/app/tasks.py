@@ -301,7 +301,7 @@ def report_parser():
         '''cols count per engineer'''
 
         # first month row
-        START_ROW = 6
+        START_ROW = 6  # can be changed if year > 2024
 
         # if no last date in xls start date will be used
         start_date = datetime(year=2022, month=1, day=1)
@@ -347,6 +347,9 @@ def report_parser():
         book.set_sheet_by_index(_start_sheet_ind)
         # start parsing for each sheet
         while not book.is_empty_sheet(min_rows=START_ROW, min_cols=N_COLS):
+            if _start_year >= 2024:
+                START_ROW = 4
+
             # count sheet sizes
             ncols = book.sheet.ncols + 1  # Natural ncols
             nrows = book.sheet.nrows + 1  # Natural nrows
