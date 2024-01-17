@@ -336,16 +336,17 @@ def report_parser():
             return engineers[__col // N_COLS]
 
         _now = datetime.now()
+        _start_year_fix = '2022-2023'
         _start_year = 2022
         _current_year = _now.year
         _sheet_names = book.sheet_names()
-        _start_sheet_ind = _sheet_names.index("2022-2023")
+        try:
+            _start_sheet_ind = _sheet_names.index(str(_start_year))
+        except ValueError:
+            _start_sheet_ind = _sheet_names.index(_start_year_fix)
         book.set_sheet_by_index(_start_sheet_ind)
         # start parsing for each sheet
-
-        i=0
-        while not book.is_empty_sheet(min_rows=START_ROW, min_cols=N_COLS) and i <= 10000:
-            i+=1
+        while not book.is_empty_sheet(min_rows=START_ROW, min_cols=N_COLS):
             # count sheet sizes
             ncols = book.sheet.ncols + 1  # Natural ncols
             nrows = book.sheet.nrows + 1  # Natural nrows
@@ -427,17 +428,17 @@ def report_parser():
                                                     mechanics_statement=_mechanics_count))
 
             # and next sheet
-            _start_year += 2
-            ind = 2024
-            _sheet_ind = _sheet_names.index(str(ind))
-            book.set_sheet_by_index(_sheet_ind)
-            """if _current_year > _start_year:
+            if _current_year > _start_year:
                 _start_year += 1
                 ind = 2022 if _start_year == 2023 else _start_year
-                _sheet_ind = _sheet_names.index(str(ind))
-                book.set_sheet_by_index(_sheet_ind)
+                try:
+                    _sheet_ind = _sheet_names.index(str(ind))
+                    book.set_sheet_by_index(_sheet_ind)
+                except ValueError:
+                    print(f'WARN: {ind} is not in sheets')
+                    pass
             else:
-                break"""
+                break
 
         # recalculate dates
         if last_date:
