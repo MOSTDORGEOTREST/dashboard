@@ -3,7 +3,7 @@ from aiogram import Bot, Dispatcher, executor, types, utils
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from io import BytesIO
-from datetime import date
+from datetime import date, timedelta
 import asyncio
 import aioschedule
 import emoji
@@ -269,8 +269,21 @@ async def scheduler():
         except (TypeError, AttributeError):
             pass
 
+    async def check_tomorrow_birthday():
+        tomorrow = date.today() + timedelta(days=1)
+        staffs = await get_respones(f'{configs.SERVER_URI}/staff/day_birthday/?month={tomorrow.month}&day={tomorrow.day}')
+        try:
+            for staff in staffs:
+                if staff == "detail":
+                    return
+                await bot.send_message(configs.MDGT_CHANNEL_ID,
+                                      text=Massages.tomorrow_happy_birthday_massage(f"{staff['last_name']} {staff['first_name']} {staff['middle_name']}", staff["phone_number"]))
+        except (TypeError, AttributeError):
+            pass
+
     aioschedule.every(20).minutes.do(check_prize)
     aioschedule.every().day.at("9:30").do(check_birthday)
+    aioschedule.every().day.at("17:30").do(check_tomorrow_birthday)
 
     while True:
         await aioschedule.run_pending()

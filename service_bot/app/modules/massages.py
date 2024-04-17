@@ -24,6 +24,11 @@ class Massages():
 ┈┗━━━━━━━━━━━┛┈""".format(name=name, phone_number=phone_number)
 
     @staticmethod
+    def tomorrow_happy_birthday_massage(name, phone_number):
+            return """Завтра празднует день рождения {name}
+    {phone_number}""".format(name=name, phone_number=phone_number)
+
+    @staticmethod
     def start_massage():
         return """Привет. Я понимаю команды:
 
