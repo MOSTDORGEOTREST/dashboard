@@ -233,7 +233,7 @@ async def echo(message: types.Message):
         else:
             await message.answer("Не найдено")
 
-    elif message.text.upper() == "НЕТ" and massage.from_user.id == configs.MDGT_CHAT_ID:
+    elif message.text.upper() == "НЕТ" and message.from_user.id == configs.MDGT_CHAT_ID:
         await message.reply("Пидора ответ")
 
 
