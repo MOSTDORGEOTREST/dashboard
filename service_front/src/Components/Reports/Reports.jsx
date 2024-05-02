@@ -24,7 +24,7 @@ export default function Reports({ toSummary }) {
 
 		function updateReportsChart() {
 			if (isLogged) {
-				fetch(`${api}works/reports/`)
+				fetch(`${api}works/reports?month_period=24`)
 					.then((response) => response.json())
 					.then((data) => {
 						if (data && Object.keys(data).length > 0) {
