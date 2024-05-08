@@ -6,5 +6,6 @@ class Config:
     MDGT_CHANNEL_ID: str = os.environ['MDGT_CHANNEL_ID']
     SERVER_URI: str = os.environ['SERVER_URI']
     SERVER_CUSTOMER_URI: str = os.environ['SERVER_CUSTOMER_URI']
+    MDGT_SITE: str = 'http://mdgt.site/'
 
 configs = Config()

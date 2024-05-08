@@ -281,9 +281,20 @@ async def scheduler():
         except (TypeError, AttributeError):
             pass
 
+    async def ping_mdgt_site():
+        response = await get_respones(configs.MDGT_SITE)
+        if response.status != 200:
+            await bot.send_message(configs.MDGT_CHAT_ID,
+                                   text=f'''
+http://mdgt.site/ http://mdgt.site/ is fucked up
+
+{str(response)}
+''')
+
     aioschedule.every(20).minutes.do(check_prize)
     aioschedule.every().day.at("9:30").do(check_birthday)
     aioschedule.every().day.at("17:30").do(check_tomorrow_birthday)
+    aioschedule.every().day.at("11:00").do(ping_mdgt_site)
 
     while True:
         await aioschedule.run_pending()
