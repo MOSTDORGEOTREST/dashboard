@@ -41,7 +41,11 @@ class OAuth2PasswordBearerWithCookie(OAuth2):
 
         scheme, param = get_authorization_scheme_param(authorization)
         if not authorization or scheme.lower() != "bearer":
-            raise exception_token
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token is wrong or missing",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
 
         return param
 
