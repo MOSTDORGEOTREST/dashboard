@@ -399,7 +399,7 @@ def report_parser():
                     continue
 
                 # then parse columns per each engineer
-                for col in range(1, ncols + 1, N_COLS):
+                for col in range(1, 115, N_COLS):
 
                     assert type(book.cell_value(row, col)) != float, "ОШИБКА В ТИПЕ ДАННЫХ. ПРОВЕРЬ ШАБЛОН"
 
