@@ -304,7 +304,7 @@ def report_parser():
         START_ROW = 6  # can be changed if year > 2024
 
         # if no last date in xls start date will be used
-        start_date = datetime(year=2022, month=1, day=1)
+        start_date = datetime(year=2024, month=1, day=1)
 
         last_date = None
         '''last defined in xls date is the last date overall'''
@@ -336,8 +336,8 @@ def report_parser():
             return engineers[__col // N_COLS]
 
         _now = datetime.now()
-        _start_year_fix = '2022-2023'
-        _start_year = 2022
+        _start_year_fix = '2025'
+        _start_year = 2025
         _current_year = _now.year
         _sheet_names = book.sheet_names()
         try:
