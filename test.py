@@ -1,14 +1,11 @@
 from datetime import date
-from dateutil import rrule
 from pydantic import BaseModel
 import os
-import xlrd
-import time
 from datetime import datetime
 #from models.work import Work, WorkCreate
 #from background_tasks.statment_model import XlsBook, Unit
 #from background_tasks.courses_model import XlsBookCourses, UnitCourses
-from service_updater.app.statment_model import XlsBook, Unit
+from app.scripts.statment_model import XlsBook, Unit
 
 class WorkCreate(BaseModel):
     employee_id: int

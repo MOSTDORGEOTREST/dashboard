@@ -2,34 +2,17 @@ from datetime import date
 from dateutil import rrule
 from pydantic import BaseModel
 import os
-import xlrd
 import time
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 #from models.work import Work, WorkCreate
 #from background_tasks.statment_model import XlsBook, Unit
 #from background_tasks.courses_model import XlsBookCourses, UnitCourses
-import tables as tables
 from config import configs
-from statment_model import XlsBook, Unit
-from courses_model import XlsBookCourses
+from app.scripts.statment_model import XlsBook, Unit
+from app.scripts.courses_model import XlsBookCourses
+from db import Session, engine, tables
+from scripts.prize_updater import PrizeParser
 
-engine = create_engine(
-    configs.database_url
-)
-
-Session = sessionmaker(
-    engine,
-    autocommit=False,
-    autoflush=False
-)
-class Prize(BaseModel):
-    date: date
-    value: float
-
-    class Config:
-        orm_mode = True
 
 class WorkCreate(BaseModel):
     employee_id: int
@@ -72,83 +55,6 @@ def get_staff(full=False):
         return full_staff
     else:
         return short_staff
-
-def prize_parser(current_date: date = date.today()):
-
-    def get_current_prize(excel_directory, current_date):
-        mounth, year = current_date.strftime('%m'), "20" + current_date.strftime('%y')
-        try:
-            path = os.path.join(
-                f'{excel_directory}', str(year),
-                f'{mounth}.{year} - Учет офисного времени.xls')
-
-            if os.path.exists(path):
-                with xlrd.open_workbook(path) as workbook:
-                    worksheet = workbook.sheet_by_name('Итог')
-                    prize = worksheet.cell(0, 24).value
-                if prize == "ххх" or prize == "xxx":
-                    prize = 0.0
-                else:
-                    prize = float(prize)
-            else:
-                prize = 0.0
-        except:
-            prize = 0.0
-
-        return prize
-
-    def update_run(excel_dir, base_prize, current_date):
-        prize = get_current_prize(excel_dir, current_date)
-        if prize > base_prize:
-            data = {
-                "date": date(year=current_date.year, month=current_date.month, day=25),
-                "value": prize,
-            }
-
-            prize_data = Prize(**data)
-
-            test = _get(date=prize_data.date)
-
-            if test is not None:
-                update(data=prize_data)
-            else:
-                create(data=prize_data)
-
-    def _get(date: date) -> tables.prizes:
-        session = Session()
-        prize = session.query(tables.prizes).filter_by(date=date).first()
-        session.close()
-        return prize
-
-    def update(data: Prize) -> None:
-        session = Session()
-        prize = session.query(tables.prizes).filter_by(date=data.date).first()
-        for field, value in data:
-            setattr(prize, field, value)
-        session.commit()
-        session.close()
-
-    def create(data: Prize) -> None:
-        session = Session()
-        session.add(tables.prizes(**data.dict()))
-        session.commit()
-        session.close()
-
-    excel_directory = configs.prize_directory
-
-    if not os.path.exists(excel_directory):
-        raise FileNotFoundError("Отсутствует файл премии")
-
-    _excel_directory = excel_directory
-
-    base_prize = _get(date(year=current_date.year, month=current_date.month, day=25))
-
-    if not base_prize:
-        _prize = 0.0
-    else:
-        _prize = base_prize.value
-
-    update_run(_excel_directory, _prize, current_date)
 
 def courses_parser():
     work_dict = {
@@ -481,21 +387,14 @@ def report_parser():
     bulk(reports)
 
 def parser(deelay=None):
-    print("sf")
-    def f():
-        prize_dates = [
-            date(year=dt.year, month=dt.month, day=25) for dt in rrule.rrule(
-                rrule.MONTHLY, dtstart=date(2020, 5, 1), until=date.today()
-            )]
+
+    def f(prize_parser, ix):
+
         try:
-            for i in prize_dates:
-                prize_parser(i)
+            prize_parser.daemon(general_update=True if ix == 0 else False)
             print("successful update prizes")
         except Exception as err:
             print('prizes error ', err)
-
-        tables.works.__table__.drop(engine)
-        tables.works.__table__.create(engine)
 
         try:
             courses_parser()
@@ -509,12 +408,24 @@ def parser(deelay=None):
         except Exception as err:
             print('reports error ', err)
 
+
+
     if not deelay:
-        f()
+        prize_parser = PrizeParser(
+            excel_directory=configs.statment_excel_path
+        )
+        ix = 0
+        f(prize_parser, ix)
+
     else:
+        prize_parser = PrizeParser(
+            excel_directory=configs.statment_excel_path
+        )
+        ix = 0
         while True:
             time.sleep(deelay)
-            f()
+            f(prize_parser, ix)
+            ix += 1
 
 
 if __name__ == "__main__":

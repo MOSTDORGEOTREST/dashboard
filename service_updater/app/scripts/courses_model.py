@@ -105,9 +105,6 @@ class XlsBookCourses:
 
 
 
-
-
-
 if __name__ == "__main__":
-    a = XlsBookCourses("/Users/mac1/Desktop/projects/10.Октябрь_2022_Учет техподдержки.xlsx")
+    a = XlsBookCourses("Z:/КУРСЫ ПОВЫШЕНИЯ КВАЛИФИКАЦИИ МДГТ/1. Заявки, Регистрация слушателей, Учет Договоров/Выплаты по курсам/2025.xlsx")
     print(a.get_data())
