@@ -8,11 +8,10 @@ from datetime import datetime
 #from background_tasks.statment_model import XlsBook, Unit
 #from background_tasks.courses_model import XlsBookCourses, UnitCourses
 from config import configs
-from app.scripts.statment_model import XlsBook, Unit
-from app.scripts.courses_model import XlsBookCourses
-from db import Session, engine, tables
+from scripts.statment_model import XlsBook, Unit
+from scripts.courses_model import XlsBookCourses
 from scripts.prize_updater import PrizeParser
-
+from db import Session, engine, tables
 
 class WorkCreate(BaseModel):
     employee_id: int

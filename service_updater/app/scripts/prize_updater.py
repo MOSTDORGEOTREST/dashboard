@@ -7,9 +7,9 @@ from dateutil import rrule
 import xlrd
 import openpyxl
 
-from app.config import configs
-from app.db import Session, engine
-from app.db import tables
+from config import configs
+from db import Session, engine
+from db import tables
 
 
 def read_excel_cell(path: str, sheet_name: str, row: int, col: int) -> Union[str, float, None]:
@@ -185,7 +185,7 @@ class PrizeParser:
 
 if __name__ == "__main__":
     parser = PrizeParser(
-        excel_directory="Z:\МДГТ - (Учет рабоч. времени, Отпуск, Даты рожд., телефоны, план работ, Исполнители)/УЧЕТ рабочего времени/",
+        excel_directory="/files/МДГТ - (Учет рабоч. времени, Отпуск, Даты рожд., телефоны, план работ, Исполнители)/УЧЕТ рабочего времени/",
     )
     month = date.today().strftime('%m')
     year = "20" + date.today().strftime('%y')
