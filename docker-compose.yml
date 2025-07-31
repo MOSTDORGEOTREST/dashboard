@@ -1,20 +1,18 @@
-version: '3.7'
-
 services:
-  service_bot:
-    build: ./service_bot
-    container_name: service_bot
-    restart: always
-    network_mode: host
-    environment:
-    - API_TOKEN=${API_TOKEN}
-    - MDGT_CHAT_ID=${MDGT_CHAT_ID}
-    - MDGT_CHANNEL_ID=${MDGT_CHANNEL_ID}
-    - SERVER_URI=${SERVER_URI}
-    - SERVER_CUSTOMER_URI=${SERVER_CUSTOMER_URI}
-    volumes:
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
+  #service_bot:
+  #  build: ./service_bot
+  #  container_name: service_bot
+  #  restart: always
+  #  network_mode: host
+  #  environment:
+  #  - API_TOKEN=${API_TOKEN}
+  #  - MDGT_CHAT_ID=${MDGT_CHAT_ID}
+  #  - MDGT_CHANNEL_ID=${MDGT_CHANNEL_ID}
+  #  - SERVER_URI=${SERVER_URI}
+  #  - SERVER_CUSTOMER_URI=${SERVER_CUSTOMER_URI}
+  #  volumes:
+   #   - /etc/timezone:/etc/timezone:ro
+  #    - /etc/localtime:/etc/localtime:ro
 
   service_organization:
     build: ./service_organization/
@@ -42,12 +40,12 @@ services:
 
   updater:
     build: ./service_updater
-    command: bash -c 'python tasks.py'
+    command: bash -c "sleep 10 && python tasks.py"
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_NAME}
     restart: always
     volumes:
-      - /home/user_bot/disk-z:/files
+      - /home/user_bot/dashbord/disk-z:/code/app/files
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
 
@@ -67,7 +65,7 @@ services:
     ports:
       - 8500:8500
     volumes:
-      - /home/user_bot/disk-z:/files
+      - /home/user_bot/dashbord/disk-z:/code/app/files
       - /home/user_bot/databases/:/databases
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro

@@ -70,12 +70,21 @@ class PrizeData:
     date: date
     value: float
 
+def wait_for_excel_dir(possible_paths, retries=10, delay=3):
+    for _ in range(retries):
+        path = get_valid_excel_directory(possible_paths)
+        if path:
+            return path
+        print("[INFO] Директория не найдена, повтор через", delay, "сек")
+        time.sleep(delay)
+    return None
 
 class PrizeParser:
     def __init__(self, excel_directory: str):
         self.excel_directory = excel_directory
 
         if not os.path.exists(self.excel_directory):
+            print(self.excel_directory)
             raise FileNotFoundError("Отсутствует директория премий")
 
     def get_month_prize_from_excel(self, month: str, year: str) -> float:
@@ -181,16 +190,34 @@ class PrizeParser:
         session.close()
 
 
-
+def get_valid_excel_directory(possible_paths):
+    for path in possible_paths:
+        print(f"[DEBUG] Проверка пути: {path}")
+        if os.path.exists(path):
+            print(f"[INFO] Найден путь: {path}")
+            return path
+    return None
 
 if __name__ == "__main__":
-    parser = PrizeParser(
-        excel_directory="/files/МДГТ - (Учет рабоч. времени, Отпуск, Даты рожд., телефоны, план работ, Исполнители)/УЧЕТ рабочего времени/",
-    )
-    month = date.today().strftime('%m')
-    year = "20" + date.today().strftime('%y')
+    possible_paths = [
+        "/code/app/files/МДГТ - (Учет рабоч. времени, Отпуск, Даты рожд., телефоны, план работ, Исполнители)/УЧЕТ рабочего времени/",
+    ]
 
-    record = parser.get_month_prize_from_excel(month='06', year='2023')
-    print(record)
+    excel_directory = wait_for_excel_dir(possible_paths)
 
-    parser.prize_daemon(general_update=True)
+    if excel_directory is None:
+        print("[ОШИБКА] Ни один путь к директории не найден. Работа остановлена.")
+    else:
+        try:
+            parser = PrizeParser(excel_directory=excel_directory)
+
+            month = date.today().strftime('%m')
+            year = "20" + date.today().strftime('%y')
+
+            record = parser.get_month_prize_from_excel(month='06', year='2023')
+            print(record)
+
+            parser.prize_daemon(general_update=True)
+
+        except Exception as e:
+            print(f"[ОШИБКА] Произошла ошибка при работе PrizeParser: {e}")

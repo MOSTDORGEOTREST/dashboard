@@ -6,7 +6,7 @@ config = conf[0]
 
 if config == 'server':
     db_path = "/databases/organization/"
-    db_copy_dir = "/files/Обмен/Никите Романовичу/db/"
+    db_copy_dir = "/code/app/files/Обмен/Никите Романовичу/db/"
 elif config == 'linux':
     db_path = "/home/tnick/databases/organization/"
     db_copy_dir = "/run/user/1000/gvfs/smb-share:server=192.168.0.1,share=files//Обмен/Никите Романовичу/db/"

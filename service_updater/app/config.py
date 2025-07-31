@@ -13,9 +13,9 @@ def get_self_public_ip():
 class Configs_docker_compose(BaseSettings):
     host_ip: str = get_self_public_ip()
     database_url: str = Field(..., env='DATABASE_URL')
-    statment_excel_path: str = os.path.normpath("/files/МДГТ - (Учет рабоч. времени, Отпуск, Даты рожд., телефоны, план работ)/ПРОТОКОЛЫ+ведомости.xls")
-    prize_directory: str = os.path.normcase("/files/МДГТ - (Учет рабоч. времени, Отпуск, Даты рожд., телефоны, план работ)/УЧЕТ рабочего времени/")
-    courses_directory: str = os.path.normcase("/files/КУРСЫ ПОВЫШЕНИЯ КВАЛИФИКАЦИИ МДГТ/1. Заявки, Регистрация слушателей, Учет Договоров/Выплаты по курсам/")
+    statment_excel_path: str = os.path.normpath("/code/app/files/МДГТ - (Учет рабоч. времени, Отпуск, Даты рожд., телефоны, план работ)/ПРОТОКОЛЫ+ведомости.xls")
+    prize_directory: str = os.path.normcase("/code/app/files/МДГТ - (Учет рабоч. времени, Отпуск, Даты рожд., телефоны, план работ)/УЧЕТ рабочего времени/")
+    courses_directory: str = os.path.normcase("/code/app/files/КУРСЫ ПОВЫШЕНИЯ КВАЛИФИКАЦИИ МДГТ/1. Заявки, Регистрация слушателей, Учет Договоров/Выплаты по курсам/")
 
 class Configs(BaseSettings):
     host_ip: str = '37.139.85.41'
