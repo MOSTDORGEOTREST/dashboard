@@ -184,8 +184,8 @@ class PrizeParser:
         session.close()
 
     def _db_create(self, data: PrizeData) -> None:
-        session = self.Session()
-        session.add(self.tables.prizes(**data.__dict__))
+        session = Session()
+        session.add(tables.prizes(**data.__dict__))
         session.commit()
         session.close()
 

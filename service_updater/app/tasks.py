@@ -411,14 +411,14 @@ def parser(deelay=None):
 
     if not deelay:
         prize_parser = PrizeParser(
-            excel_directory=configs.statment_excel_path
+            excel_directory=configs.prize_directory
         )
         ix = 0
         f(prize_parser, ix)
 
     else:
         prize_parser = PrizeParser(
-            excel_directory=configs.statment_excel_path
+            excel_directory=configs.prize_directory
         )
         ix = 0
         while True:
