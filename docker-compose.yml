@@ -5,11 +5,11 @@ services:
     restart: always
     network_mode: host
     environment:
-    - API_TOKEN=${API_TOKEN}
-    - MDGT_CHAT_ID=${MDGT_CHAT_ID}
-    - MDGT_CHANNEL_ID=${MDGT_CHANNEL_ID}
-    - SERVER_URI=${SERVER_URI}
-    - SERVER_CUSTOMER_URI=${SERVER_CUSTOMER_URI}
+      - API_TOKEN=${API_TOKEN}
+      - MDGT_CHAT_ID=${MDGT_CHAT_ID}
+      - MDGT_CHANNEL_ID=${MDGT_CHANNEL_ID}
+      - SERVER_URI=${SERVER_URI}
+      - SERVER_CUSTOMER_URI=${SERVER_CUSTOMER_URI}
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -36,7 +36,6 @@ services:
     ports:
       - 80:80
     restart: always
-
 
   updater:
     build: ./service_updater
@@ -70,4 +69,29 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
 
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    ports:
+      - 9100:9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+      - /home/user_bot/logger/portainer:/logs
 
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: always
+    ports:
+      - 8180:8080
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /home/user_bot/logger/cadvisor:/logs
+
+volumes:
+  portainer_data:
