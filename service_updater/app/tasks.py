@@ -305,7 +305,9 @@ def report_parser():
 
                 # then parse columns per each engineer
                 for col in range(1, 115, N_COLS):
-
+                    value = book.cell_value(row, col)
+                    if isinstance(value, float):
+                        raise ValueError(f"ОШИБКА: Недопустимый тип float в ячейке. Значение: {value}")
                     assert type(book.cell_value(row, col)) != float, "ОШИБКА В ТИПЕ ДАННЫХ. ПРОВЕРЬ ШАБЛОН"
 
                     _object = book.cell_value(row, col).replace(' ', '')
