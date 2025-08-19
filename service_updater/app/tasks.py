@@ -305,12 +305,15 @@ def report_parser():
 
                 # then parse columns per each engineer
                 for col in range(1, 115, N_COLS):
-                    value = book.cell_value(row, col)
-                    if isinstance(value, float):
+                    raw_value = book.cell_value(row, col)
+                    normalized_value = normalize_cell_value(raw_value)
+                    _object = normalized_value.replace(' ', '')
+                    #value = book.cell_value(row, col)
+                    if isinstance(normalized_value, float):
                         raise ValueError(f"ОШИБКА: Недопустимый тип float в ячейке. Значение: {value}")
-                    assert type(book.cell_value(row, col)) != float, "ОШИБКА В ТИПЕ ДАННЫХ. ПРОВЕРЬ ШАБЛОН"
+                    #assert type(book.cell_value(row, col)) != float, "ОШИБКА В ТИПЕ ДАННЫХ. ПРОВЕРЬ ШАБЛОН"
 
-                    _object = book.cell_value(row, col).replace(' ', '')
+                    #_object = book.cell_value(row, col).replace(' ', '')
 
                     # first one should find out if there any object (per each engineer)
                     if not engineer(col) or not _object:
@@ -364,6 +367,21 @@ def report_parser():
                     result[next_month(start_date)] = __result[date]
 
         return result
+
+    def normalize_cell_value(value):
+        if isinstance(value, float) and value.is_integer():
+            return str(int(value))
+        elif isinstance(value, (int, float)):
+            return str(value)  
+        elif isinstance(value, str):
+            value = value.strip()
+            try:
+                num = float(value.replace(',', '.')) 
+                return str(int(num)) if num.is_integer() else str(num)
+            except ValueError:
+                return value  
+        else:
+            return str(value)
 
     def bulk(data_list: list) -> None:
         session = Session()
