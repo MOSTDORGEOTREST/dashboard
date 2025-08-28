@@ -127,6 +127,12 @@ class PrizeParser:
 
         existing = self._db_get(prize_date)
 
+        if existing:
+            print(f"[DEBUG] Дата: {prize_date}, Текущая премия в БД: {existing.value}, Новая премия: {prize}")
+        else:
+            print(f"[DEBUG] Дата: {prize_date}, Запись не найдена в БД, Новая премия: {prize}")
+
+
         if existing is None or prize > existing.value:
             data = PrizeData(date=prize_date, value=prize)
             if existing:

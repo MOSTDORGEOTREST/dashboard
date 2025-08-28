@@ -401,8 +401,10 @@ def report_parser():
     for work in get_works(statment_data):
         try:
             reports.append(tables.works(**work.dict()))
-        except:
-            pass
+        except Exception as e:
+            print(f"Ошибка при добавлении записи work: {e}")
+            print(f"Данные work: {work.dict()}")
+            continue
     bulk(reports)
 
 def parser(deelay=None):
@@ -412,6 +414,13 @@ def parser(deelay=None):
         try:
             prize_parser.daemon(general_update=True if ix == 0 else False)
             print("successful update prizes")
+            session = Session()
+            latest_prize = session.query(tables.prizes).order_by(tables.prizes.date.desc()).first()
+            if latest_prize:
+                print(f"[DEBUG] Последняя премия в БД: {latest_prize.date} = {latest_prize.value}")
+            else:
+                print("[DEBUG] Премии в БД не найдены")
+            session.close()
         except Exception as err:
             print('prizes error ', err)
 
