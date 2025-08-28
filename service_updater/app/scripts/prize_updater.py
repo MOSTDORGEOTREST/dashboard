@@ -6,7 +6,7 @@ from typing import Optional, Union, List
 from dateutil import rrule
 import xlrd
 import openpyxl
-
+import datetime
 from config import configs
 from db import Session, engine
 from db import tables
@@ -75,7 +75,7 @@ def wait_for_excel_dir(possible_paths, retries=10, delay=3):
         path = get_valid_excel_directory(possible_paths)
         if path:
             return path
-        print("[INFO] Директория не найдена, повтор через", delay, "сек")
+        print("Директория не найдена, повтор через", delay, "сек")
         time.sleep(delay)
     return None
 
@@ -93,6 +93,10 @@ class PrizeParser:
             year=year,
             month=month
         )
+        file_modified = os.path.getmtime(excel_file)
+        file_modified_date = datetime.datetime.fromtimestamp(file_modified)
+        print(f"Excel файл: {excel_file}")
+        print(f"Последнее изменение файла: {file_modified_date}")
 
         prize_raw = read_excel_cell(
             path=excel_file,
@@ -100,7 +104,7 @@ class PrizeParser:
             row=0,
             col=24
         )
-
+        print(f"Значение из Excel ячейки [0,24]: {prize_raw}")
         if str(prize_raw).lower() in {"xxx", "ххх"}:
             raise ValueError("Неверная запись")
 
@@ -128,18 +132,21 @@ class PrizeParser:
         existing = self._db_get(prize_date)
 
         if existing:
-            print(f"[DEBUG] Дата: {prize_date}, Текущая премия в БД: {existing.value}, Новая премия: {prize}")
+            print(f"Дата: {prize_date}, Текущая премия в БД: {existing.value}, Новая премия: {prize}")
         else:
-            print(f"[DEBUG] Дата: {prize_date}, Запись не найдена в БД, Новая премия: {prize}")
+            print(f"Дата: {prize_date}, Запись не найдена в БД, Новая премия: {prize}")
 
 
         if existing is None or prize > existing.value:
+            print(f"ОБНОВЛЯЕМ: existing={existing.value if existing else 'None'}, new={prize}")
             data = PrizeData(date=prize_date, value=prize)
             if existing:
                 self._db_update(data)
             else:
                 self._db_create(data)
             return data
+        else:
+            print(f"НЕ ОБНОВЛЯЕМ: existing={existing.value}, new={prize} (новое значение не больше существующего)")
 
         return None
 
@@ -198,9 +205,9 @@ class PrizeParser:
 
 def get_valid_excel_directory(possible_paths):
     for path in possible_paths:
-        print(f"[DEBUG] Проверка пути: {path}")
+        print(f"Проверка пути: {path}")
         if os.path.exists(path):
-            print(f"[INFO] Найден путь: {path}")
+            print(f"Найден путь: {path}")
             return path
     return None
 

@@ -41,7 +41,7 @@ services:
     build: ./service_updater
     command: bash -c "python tasks.py"
     environment:
-      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_NAME}
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_NAME}
     restart: always
     volumes:
       - /home/user_bot/dashbord/disk-z:/code/app/files
