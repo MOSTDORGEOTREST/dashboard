@@ -412,7 +412,8 @@ def parser(deelay=None):
     def f(prize_parser, ix):
 
         try:
-            prize_parser.daemon(general_update=True if ix == 0 else False)
+            #if ix == 0 else False
+            prize_parser.daemon(general_update=True)
             print("successful update prizes")
             session = Session()
             latest_prize = session.query(tables.prizes).order_by(tables.prizes.date.desc()).first()
