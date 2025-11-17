@@ -39,30 +39,62 @@ def read_excel_cell(path: str, sheet_name: str, row: int, col: int) -> Union[str
     else:
         raise ValueError("Формат файла должен быть .xls или .xlsx")
 
+
 def find_excel_file(directory: str, year: str, month: str) -> str:
     """
-    Возвращает путь к существующему Excel-файлу (.xlsx или .xls)
+    Поиск Excel-файла по году и месяцу с приоритизацией форматов.
 
-    :param directory: Базовая директория с Excel-файлами (str)
-    :param year: Год, например '2025'
-    :param month: Месяц, например '06'
-    :return: Путь к найденному Excel-файлу (str)
-    :raises FileNotFoundError: если файл не найден
+    Функция ищет файлы в следующем приоритете:
+    1. Первый поиск - старый формат названия: "06.2025 - Учет офисного времени"
+    2. Второй поиск - новый формат названия: "06.2025 - Учет работ"
+
+    Для каждого формата проверяет расширения в порядке: .xlsx, .xls
+
+    Параметры:
+        directory (str): Базовая директория с Excel-файлами
+        year (str): Год в формате '2025'
+        month (str): Месяц в формате '06'
+
+    Возвращает:
+        str: Полный путь к найденному Excel-файлу
+
+    Исключения:
+        FileNotFoundError: Если ни один из вариантов файла не найден.
+                         Выводит все проверенные пути для отладки.
     """
-    base_filename = f"{month}.{year} - Учет офисного времени"
-    year_dir = os.path.join(directory, year)
+    # Определяем директорию года
+    year_dir = Path(directory) / year
 
-    candidates: List[str] = [
-        os.path.join(year_dir, f"{base_filename}.xlsx"),
-        os.path.join(year_dir, f"{base_filename}.xls"),
+    # Определяем возможные названия файлов в порядке приоритета
+    # Приоритет 1: Старый формат названия
+    # Приоритет 2: Новый формат названия
+    file_templates = [
+        f"{month}.{year} - Учет офисного времени",
+        f"{month}.{year} - Учет работ",
     ]
 
-    for path in candidates:
-        if os.path.exists(path):
-            return path
+    # Расширения файлов в порядке предпочтения
+    extensions = [".xlsx", ".xls"]
 
-    checked = "\n".join(candidates)
-    raise FileNotFoundError(f"Excel-файл не найден. Проверены пути:\n{checked}")
+    # Собираем все возможные пути для сообщения об ошибке
+    all_checked_paths: List[str] = []
+
+    # Проходимся по каждому формату названия
+    for template in file_templates:
+        # Проходимся по каждому расширению
+        for ext in extensions:
+            file_path = year_dir / f"{template}{ext}"
+            all_checked_paths.append(str(file_path))
+
+            # Если файл найден - возвращаем его
+            if file_path.exists():
+                return str(file_path)
+
+    # Если ничего не найдено - выбрасываем исключение с полной информацией
+    checked_paths_str = "\n".join(all_checked_paths)
+    raise FileNotFoundError(
+        f"Excel-файл не найден. Проверены пути:\n{checked_paths_str}"
+    )
 
 
 @dataclass
