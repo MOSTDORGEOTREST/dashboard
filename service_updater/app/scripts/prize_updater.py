@@ -83,12 +83,12 @@ def find_excel_file(directory: str, year: str, month: str) -> str:
     for template in file_templates:
         # Проходимся по каждому расширению
         for ext in extensions:
-            file_path = year_dir / f"{template}{ext}"
-            all_checked_paths.append(str(file_path))
+            file_path = os.path.join(year_dir, f"{template}{ext}")
+            all_checked_paths.append(file_path)
 
             # Если файл найден - возвращаем его
-            if file_path.exists():
-                return str(file_path)
+            if os.path.exists(file_path):
+                return file_path
 
     # Если ничего не найдено - выбрасываем исключение с полной информацией
     checked_paths_str = "\n".join(all_checked_paths)
