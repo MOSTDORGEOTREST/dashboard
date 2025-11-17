@@ -63,7 +63,7 @@ def find_excel_file(directory: str, year: str, month: str) -> str:
                          Выводит все проверенные пути для отладки.
     """
     # Определяем директорию года
-    year_dir = Path(directory) / year
+    year_dir = os.path.join(directory, year)
 
     # Определяем возможные названия файлов в порядке приоритета
     # Приоритет 1: Старый формат названия
